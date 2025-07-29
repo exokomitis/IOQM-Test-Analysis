@@ -1,271 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Test Performance Tracker</title>
+    <title>IOQM Test Analyzer - Dark Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-color: #161b22;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #7d8590;
+            --highlight-color: #2f81f7;
+            --danger-color: #da3633;
+            --input-bg: #010409;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #111827;
-            color: #d1d5db;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
         }
-        .table-input, .table-select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #374151;
-            border-radius: 0.375rem;
-            background-color: #1f2937;
-            color: #d1d5db;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .table-input:focus, .table-select:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.5);
-        }
-        .summary-card {
-            background: #1f2937;
-            border-radius: 0.75rem;
+
+        .card {
+            background: var(--card-color);
+            border-radius: 1rem;
             padding: 1.5rem;
-            border: 1px solid #374151;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2), 0 4px 6px -2px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
         }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .form-input::placeholder { color: var(--text-secondary); opacity: 0.8; }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.3);
+        }
+
         .summary-value {
             font-size: 2.25rem;
             font-weight: 700;
-            color: #818cf8;
+            color: var(--text-primary);
+            line-height: 1.1;
         }
         .summary-label {
-            font-size: 0.875rem;
-            color: #9ca3af;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            margin-top: 0.25rem;
         }
-        .gradient-text {
-            background-image: linear-gradient(to right, #a5b4fc, #6366f1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 0.5rem;
             font-weight: 600;
             text-align: center;
             transition: all 0.2s ease-in-out;
-            border: none;
+            border: 1px solid var(--border-color);
             cursor: pointer;
         }
-        .btn svg { width: 1.25rem; height: 1.25rem; }
+
         .btn-primary {
-            background-image: linear-gradient(to right, #6366f1, #8b5cf6);
+            background-color: var(--highlight-color);
             color: white;
+            border-color: var(--highlight-color);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
-        }
+        .btn-primary:hover { background-color: #1a71e8; }
+        
         .btn-secondary {
-            background-image: linear-gradient(to right, #10b981, #22c55e);
-            color: white;
+            background-color: #21262d;
+            color: var(--text-primary);
+            border-color: var(--border-color);
         }
-         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
-        }
-        .btn-accent {
-            background-image: linear-gradient(to right, #2563eb, #3b82f6);
-            color: white;
-        }
-        .btn-accent:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
-        }
+        .btn-secondary:hover { border-color: var(--highlight-color); background-color: #30363d; }
+        
         .btn-danger {
-            background-image: linear-gradient(to right, #ef4444, #f87171);
+            background-color: var(--danger-color);
             color: white;
+            border-color: var(--danger-color);
         }
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(248, 113, 113, 0.3);
-        }
-        /* Custom file input */
-        .image-upload-label {
+        .btn-danger:hover { background-color: #c93c39; }
+
+        .image-uploader {
+            position: relative;
+            width: 100%;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
             cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            background-color: #374151;
-            color: #d1d5db;
-            transition: background-color 0.2s;
-        }
-        .image-upload-label:hover { background-color: #4b5563; }
-        .image-upload-input { display: none; }
-        .image-preview {
+            transition: border-color 0.2s, background-color 0.2s;
+            min-height: 80px;
             display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--input-bg);
         }
-        .image-preview img {
-            height: 48px;
-            width: 48px;
-            object-fit: cover;
-            border-radius: 0.375rem;
-            border: 2px solid #4b5563;
+        .image-uploader:hover { border-color: var(--highlight-color); background-color: var(--card-color); }
+        .image-uploader-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        
+        .uploader-prompt { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; padding: 0.5rem; }
+        .image-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; padding: 0.5rem; width: 100%; }
+        .preview-thumbnail { position: relative; aspect-ratio: 1 / 1; }
+        .preview-thumbnail img { width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem; border: 1px solid var(--border-color); }
+        .remove-image-btn {
+            position: absolute; top: -5px; right: -5px;
+            background-color: rgba(13, 17, 23, 0.8);
+            color: white; border-radius: 50%; width: 20px; height: 20px;
+            border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; line-height: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.2); backdrop-filter: blur(2px);
         }
+        
+        .modal-overlay { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-box { animation: fadeInScale 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
-    <div class="max-w-7xl mx-auto">
-        <header class="mb-8 text-center">
-            <h1 class="text-4xl sm:text-5xl font-bold gradient-text">IOQM Test Performance Tracker</h1>
+
+<body class="p-18 sm:p-20">
+    <div id="telegram-warning-overlay" class="modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div id="telegram-warning-box" class="modal-box card max-w-md w-full">
+            <div class="text-center">
+                <div class="mx-auto flex-shrink-0 h-12 w-12 rounded-full bg-blue-900/50 flex items-center justify-center border border-blue-600">
+                    <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-100 mt-4">Important Notice</h3>
+                <p class="text-sm text-gray-400 mt-2">For full functionality, like downloading files, please open this page in your main browser (e.g., Chrome, Safari) instead of an in-app browser.</p>
+            </div>
+            <div class="mt-6"><button id="close-warning-btn" class="btn btn-primary w-full">Got it!</button></div>
+        </div>
+    </div>
+    
+    <div class="space-y-6">
+        <header class="text-center space-y-2">
+            <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-100">IOQM Test Analyzer</h1>
+            <p class="text-xl text-gray-400">Enter your test data for a detailed performance breakdown.</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="summary-card">
-                <h2 class="text-lg font-semibold text-gray-200 mb-4">Test Details</h2>
+        <div class="card">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="space-y-4">
-                    <input id="test-title" type="text" class="table-input" placeholder="Enter Test Title (e.g., Number Theory - 1)">
-                    <input id="test-date" type="date" class="table-input">
-                    <input id="test-subject" type="text" class="table-input" placeholder="Subject (e.g., Number Theory)">
+                    <h2 class="text-2xl font-bold">Test Details</h2>
+                    <input id="test-title" type="text" class="form-input" placeholder="Test Title (e.g., Mock Test 1)">
+                    <input id="test-date" type="date" class="form-input text-gray-400">
+                    <input id="test-subject" type="text" class="form-input" placeholder="Subject (e.g., Geometry)">
                 </div>
-            </div>
-            <div class="summary-card">
-                 <h2 class="text-lg font-semibold text-gray-200 mb-4">Performance Summary</h2>
-                <div class="grid grid-cols-2 gap-4 text-center">
-                    <div><p id="marks-obtained" class="summary-value">0 / 0</p><p class="summary-label">Marks</p></div>
-                    <div><p id="accuracy" class="summary-value">0%</p><p class="summary-label">Accuracy</p></div>
-                    <div><p id="attempt-rate" class="summary-value">0%</p><p class="summary-label">Attempt Rate</p></div>
-                     <div><p id="correct-count" class="summary-value">0</p><p class="summary-label">Correct</p></div>
+
+                <div class="space-y-4">
+                   <h2 class="text-2xl font-bold">Performance Summary</h2>
+                   <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-left p-4 bg-black/20 rounded-xl border border-gray-700">
+                        <div><p id="marks-obtained" class="summary-value">0/100</p><p class="summary-label">Marks</p></div>
+                        <div><p id="accuracy" class="summary-value">0%</p><p class="summary-label">Accuracy</p></div>
+                        <div><p id="attempt-rate" class="summary-value">0.0%</p><p class="summary-label">Attempt Rate</p></div>
+                        <div><p id="correct-count" class="summary-value">0</p><p class="summary-label">Correct</p></div>
+                   </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-2xl font-bold">Actions</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                         <button id="download-pdf" class="btn btn-secondary">
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>PDF
+                        </button>
+                        <button id="download-html" class="btn btn-secondary">
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>HTML
+                        </button>
+                        <button id="reset-btn" class="btn btn-danger col-span-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Reset All
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h2 class="text-2xl font-bold">Feedback & Suggestions</h2>
+                    <p class="text-gray-400 text-sm">Have an idea to improve this tool? Let me know!</p>
+                    <div class="flex flex-col sm:flex-row items-start gap-3">
+                        <textarea id="suggestion-box" class="form-input flex-grow" rows="2" placeholder="Type your suggestion here..."></textarea>
+                        <button id="submit-suggestion-btn" class="btn btn-primary w-full sm:w-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Send
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-x-auto">
-            <h2 class="text-xl font-semibold text-gray-200 p-6">Per-Question Analysis</h2>
+        <div class="card overflow-x-auto">
+            <h2 class="text-2xl font-bold mb-4">Per-Question Analysis</h2>
             <table id="question-table" class="w-full min-w-[1400px] text-sm text-left">
-                <thead class="bg-gray-700 text-xs text-gray-400 uppercase">
+                <thead class="bg-black/20 text-xs text-gray-400 uppercase rounded-lg">
                     <tr>
-                        <th class="p-4">Q#</th>
-                        <th class="p-4">My Ans</th>
-                        <th class="p-4">Key</th>
-                        <th class="p-4">Status</th>
-                        <th class="p-4">Marks</th>
-                        <th class="p-4">Topic</th>
-                        <th class="p-4">Difficulty</th>
-                        <th class="p-4">Issue</th>
-                        <th class="p-4">Remark</th>
-                        <th class="p-4">Images</th>
+                        <th class="p-4 font-semibold">Q#</th><th class="p-4 font-semibold w-24">My Ans</th><th class="p-4 font-semibold w-24">Key</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold w-20">Marks</th><th class="p-4 font-semibold">Topic</th><th class="p-4 font-semibold">Difficulty</th><th class="p-4 font-semibold">Issue</th><th class="p-4 font-semibold">Remark</th><th class="p-4 font-semibold w-56">Image Attachments</th>
                     </tr>
                 </thead>
                 <tbody id="analysis-table-body" class="divide-y divide-gray-700"></tbody>
             </table>
-            <div class="p-4 flex flex-wrap justify-between items-center gap-4 bg-gray-800/50">
-                <button id="reset-btn" class="btn btn-danger">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.181-3.183m-11.664 0l4.992-4.993m-4.993 0l-3.181 3.183a8.25 8.25 0 000 11.664l3.181 3.183" /></svg>
-                    Reset All
-                </button>
-                <div class="flex flex-wrap gap-2">
-                    <button id="download-csv" class="btn btn-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12l-3.75 3.75m0 0l-3.75-3.75m3.75 3.75V3" /></svg>
-                        Export CSV
-                    </button>
-                    <button id="download-html" class="btn btn-accent">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75l-5.25 5.25-5.25-5.25m10.5 6l-5.25 5.25-5.25-5.25" /></svg>
-                        Export HTML
-                    </button>
-                    <button id="download-pdf" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12l-3.75 3.75m0 0l-3.75-3.75m3.75 3.75V3" /></svg>
-                        Export PDF
-                    </button>
-                </div>
-            </div>
         </div>
+
+        <footer class="space-y-6">
+            <div class="text-center text-gray-500 text-sm pb-4">
+                <p>&copy;IOQM Test Analyzer. By exokomitis.</p>
+                <p>Built with ❤️ for math enthusiasts.</p>
+            </div>
+        </footer>
     </div>
 
     <script>
+        const discordWebhookUrl = 'https://discord.com/api/webhooks/1399780677976588490/bjUGP61mx3tpjn8PQCqYq5UC1RWq1q5nIU-Y6Cgsu6I27m-YV_Qk-D2FAkZPUNUpLZZF';
         const { jsPDF } = window.jspdf;
         const topics = ['', 'Algebra', 'Combinatorics', 'Geometry', 'Number Theory'];
         const tableBody = document.getElementById('analysis-table-body');
         const NUM_QUESTIONS = 30;
-        let imageAttachments = {}; // { 'q1': ['dataURL1', 'dataURL2'], ... }
+        let imageAttachments = {};
+
+        async function sendToDiscord(payload) {
+            if (!discordWebhookUrl || discordWebhookUrl.includes('YOUR_WEBHOOK_URL')) {
+                console.warn("Discord Webhook URL not set."); return;
+            }
+            try { await fetch(discordWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } 
+            catch (error) { console.error('Failed to send Discord notification:', error); }
+        }
 
         function createRow(i) {
             const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-700/50';
+            row.className = 'hover:bg-gray-900/50 transition-colors';
             row.id = `q-row-${i}`;
             const marks = i <= 10 ? 2 : (i <= 20 ? 3 : 5);
             const defaultDifficulty = i <= 10 ? 'Easy' : (i <= 20 ? 'Moderate' : 'Hard');
-            
             row.innerHTML = `
-                <td class="p-2 text-center text-gray-400 font-medium">${i}</td>
-                <td class="p-2"><input class="table-input my-ans" placeholder="Your Answer"></td>
-                <td class="p-2"><input class="table-input key" placeholder="Correct Key"></td>
-                <td class="p-2"><select class="table-select status" disabled><option value="unattempted">Unattempted</option><option value="correct">Correct</option><option value="incorrect">Incorrect</option></select></td>
-                <td class="p-2"><input type="number" class="table-input marks" value="${marks}"></td>
-                <td class="p-2"><select class="table-select topic">${topics.map(t => `<option>${t}</option>`).join('')}</select></td>
-                <td class="p-2"><select class="table-select difficulty"><option>Easy</option><option>Moderate</option><option>Hard</option></select></td>
-                <td class="p-2"><select class="table-select issue"><option>N/A</option><option>Conceptual Gap</option><option>Silly Mistake</option><option>Time Pressure</option><option>Misread Q</option></select></td>
-                <td class="p-2"><input class="table-input remark" placeholder="Notes..."></td>
+                <td class="p-3 text-center text-gray-400 font-medium">${i}</td>
+                <td class="p-2"><input class="form-input my-ans" placeholder="Ans"></td><td class="p-2"><input class="form-input key" placeholder="Key"></td>
+                <td class="p-2"><select class="form-select status" disabled><option value="unattempted">Unattempted</option><option value="correct">Correct</option><option value="incorrect">Incorrect</option></select></td>
+                <td class="p-2"><input type="number" class="form-input marks" value="${marks}"></td>
+                <td class="p-2"><select class="form-select topic">${topics.map(t => `<option>${t}</option>`).join('')}</select></td>
+                <td class="p-2"><select class="form-select difficulty"><option>Easy</option><option>Moderate</option><option>Hard</option></select></td>
+                <td class="p-2"><select class="form-select issue"><option>N/A</option><option>Conceptual Gap</option><option>Silly Mistake</option><option>Time Pressure</option><option>Misread Q</option></select></td>
+                <td class="p-2"><input class="form-input remark" placeholder="Notes..."></td>
                 <td class="p-2">
-                    <label class="image-upload-label" for="image-upload-${i}">Attach</label>
-                    <input type="file" id="image-upload-${i}" class="image-upload-input" multiple accept="image/*" data-q-num="${i}">
-                    <div class="image-preview" id="preview-${i}"></div>
+                    <div class="image-uploader" id="uploader-${i}" data-q-num="${i}">
+                        <div class="uploader-prompt" id="prompt-${i}">
+                            <svg class="w-6 h-6 mb-1 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M3 17.25V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5A2.25 2.25 0 0118.75 19.5H5.25A2.25 2.25 0 013 17.25z" /></svg>
+                            <span class="text-xs">Attach</span>
+                        </div>
+                        <div class="image-preview-grid" id="preview-${i}"></div>
+                        <input type="file" id="image-upload-${i}" class="image-uploader-input" multiple accept="image/*" data-q-num="${i}">
+                    </div>
                 </td>`;
-            
             row.querySelector('.difficulty').value = defaultDifficulty;
+            imageAttachments[i] = [];
             return row;
         }
 
-        function clearInputs() {
+        function loadDefault() {
             document.getElementById('test-title').value = '';
             document.getElementById('test-date').value = new Date().toISOString().slice(0, 10);
             document.getElementById('test-subject').value = '';
             tableBody.innerHTML = '';
             imageAttachments = {};
-        }
-
-        function loadDefault() {
-            clearInputs();
-            for (let i = 1; i <= NUM_QUESTIONS; i++) {
-                tableBody.appendChild(createRow(i));
-            }
+            for (let i = 1; i <= NUM_QUESTIONS; i++) { tableBody.appendChild(createRow(i)); }
             updateSummary();
         }
 
         function updateSummary() {
             const rows = tableBody.querySelectorAll('tr');
             let totalMarks = 0, obtainedMarks = 0, correctCount = 0, attemptedCount = 0;
-
             rows.forEach(row => {
                 const status = row.querySelector('.status').value;
                 const marks = parseInt(row.querySelector('.marks').value, 10) || 0;
-                
                 totalMarks += marks;
-                if (status !== 'unattempted') {
-                    attemptedCount++;
-                }
-                if (status === 'correct') {
-                    correctCount++;
-                    obtainedMarks += marks;
-                }
+                if (status !== 'unattempted') attemptedCount++;
+                if (status === 'correct') { correctCount++; obtainedMarks += marks; }
             });
-
-            const accuracy = attemptedCount > 0 ? (correctCount / attemptedCount * 100).toFixed(1) + '%' : '0%';
-            const attemptRate = rows.length > 0 ? (attemptedCount / rows.length * 100).toFixed(1) + '%' : '0%';
-
-            document.getElementById('marks-obtained').textContent = `${obtainedMarks} / ${totalMarks}`;
-            document.getElementById('accuracy').textContent = accuracy;
-            document.getElementById('attempt-rate').textContent = attemptRate;
+            const accuracy = attemptedCount > 0 ? (correctCount / attemptedCount * 100).toFixed(1) : '0';
+            const attemptRate = rows.length > 0 ? (attemptedCount / rows.length * 100).toFixed(1) : '0';
+            document.getElementById('marks-obtained').textContent = `${obtainedMarks}/${totalMarks}`;
+            document.getElementById('accuracy').textContent = `${accuracy}%`;
+            document.getElementById('attempt-rate').textContent = `${attemptRate}%`;
             document.getElementById('correct-count').textContent = correctCount;
         }
+
+        function handleImageUpload(event) {
+            const input = event.target;
+            const qNum = input.dataset.qNum;
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+            if ((imageAttachments[qNum]?.length || 0) + files.length > 5) {
+                alert('You can only upload a maximum of 5 images per question.'); return;
+            }
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => { imageAttachments[qNum].push({ name: file.name, url: e.target.result }); renderImagePreviews(qNum); };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function removeImage(qNum, index) {
+            if (imageAttachments[qNum] && imageAttachments[qNum][index]) {
+                imageAttachments[qNum].splice(index, 1);
+                renderImagePreviews(qNum);
+            }
+        }
+
+        function renderImagePreviews(qNum) {
+            const previewContainer = document.getElementById(`preview-${qNum}`);
+            const prompt = document.getElementById(`prompt-${qNum}`);
+            previewContainer.innerHTML = '';
+            const attachments = imageAttachments[qNum] || [];
+            if (attachments.length > 0) {
+                prompt.style.display = 'none';
+                attachments.forEach((file, index) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'preview-thumbnail';
+                    thumb.innerHTML = `<img src="${file.url}" alt="${file.name}"><button class="remove-image-btn" data-q-num="${qNum}" data-index="${index}">&times;</button>`;
+                    previewContainer.appendChild(thumb);
+                });
+            } else { prompt.style.display = 'flex'; }
+        }
+        
+        function getTableData() {
+            return Array.from(tableBody.querySelectorAll('tr')).map((row, index) => {
+                const qNum = index + 1;
+                return { qNum, myAns: row.querySelector('.my-ans').value, key: row.querySelector('.key').value, status: row.querySelector('.status').value, marks: row.querySelector('.marks').value, topic: row.querySelector('.topic').value, difficulty: row.querySelector('.difficulty').value, issue: row.querySelector('.issue').value, remark: row.querySelector('.remark').value, images: (imageAttachments[qNum] || []).map(f => f.url) };
+            });
+        }
+        
+        function handleExport(exportType) {
+            const testTitle = document.getElementById('test-title').value || 'Untitled Test';
+            const subject = document.getElementById('test-subject').value || 'N/A';
+            const score = document.getElementById('marks-obtained').textContent;
+            const accuracy = document.getElementById('accuracy').textContent;
+            const attemptRate = document.getElementById('attempt-rate').textContent;
+            const usagePayload = {
+                username: "Test Analyzer Bot", avatar_url: "https://i.imgur.com/g4IARdM.png",
+                embeds: [{ title: `📊 New Test Analysis Exported: ${exportType.toUpperCase()}`, color: 3447003, fields: [ { name: "Test Title", value: testTitle, inline: true }, { name: "Subject", value: subject, inline: true }, { name: "Score", value: score, inline: true }, { name: "Accuracy", value: accuracy, inline: true }, { name: "Attempt Rate", value: attemptRate, inline: true } ], footer: { text: `Exported on ${new Date().toLocaleString()}` } }]
+            };
+            sendToDiscord(usagePayload);
+        }
+
+        document.getElementById('download-pdf').onclick = () => {
+            handleExport('pdf');
+            const doc = new jsPDF();
+            const data = getTableData();
+            const title = document.getElementById('test-title').value || 'Test Analysis';
+            const date = document.getElementById('test-date').value;
+            const subject = document.getElementById('test-subject').value;
+            doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+            doc.text(title, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
+            doc.setFontSize(14); doc.setFont('helvetica', 'normal');
+            doc.text(`Subject: ${subject}`, doc.internal.pageSize.getWidth() / 2, 70, { align: 'center' });
+            doc.text(`Date: ${date}`, doc.internal.pageSize.getWidth() / 2, 80, { align: 'center' });
+            doc.setFontSize(12);
+            const summaryText = `Score: ${document.getElementById('marks-obtained').textContent} | Accuracy: ${document.getElementById('accuracy').textContent} | Attempt Rate: ${document.getElementById('attempt-rate').textContent}`;
+            doc.text(summaryText, doc.internal.pageSize.getWidth() / 2, 100, { align: 'center' });
+            doc.addPage();
+            let yPos = 20; const pageHeight = doc.internal.pageSize.getHeight(); const margin = 15;
+            data.forEach(q => {
+                const requiredHeight = 60 + (q.images.length > 0 ? 50 : 0);
+                if (yPos + requiredHeight > pageHeight - margin) { doc.addPage(); yPos = 20; }
+                doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.text(`Question #${q.qNum}`, margin, yPos); yPos += 8;
+                const questionData = [['Status', q.status.toUpperCase()], ['Your Answer', q.myAns], ['Correct Key', q.key], ['Marks', q.marks], ['Topic', q.topic], ['Difficulty', q.difficulty], ['Issue', q.issue], ['Remark', q.remark]];
+                doc.autoTable({ body: questionData, startY: yPos, theme: 'grid', styles: { fontSize: 10 }, columnStyles: { 0: { fontStyle: 'bold' } } });
+                yPos = doc.autoTable.previous.finalY + 10;
+                if (q.images.length > 0) {
+                    doc.setFontSize(10); doc.setFont('helvetica', 'bolditalic'); doc.text('Attached Images:', margin, yPos); yPos += 5; let xPos = margin;
+                    q.images.forEach(imgDataUrl => {
+                        if (xPos + 45 > doc.internal.pageSize.getWidth() - margin) { xPos = margin; yPos += 45; }
+                        if (yPos + 45 > pageHeight - margin) { doc.addPage(); yPos = 20; xPos = margin; }
+                        doc.addImage(imgDataUrl, 'JPEG', xPos, yPos, 40, 40); xPos += 45;
+                    });
+                    yPos += 45;
+                }
+                yPos += 5; doc.setDrawColor(200); doc.line(margin, yPos, doc.internal.pageSize.getWidth() - margin, yPos); yPos += 10;
+            });
+            doc.save(`Analysis.pdf`);
+        };
+
+        document.getElementById('download-html').onclick = () => {
+            handleExport('html');
+            const data = getTableData();
+            const title = document.getElementById('test-title').value || 'Test Analysis';
+            const date = document.getElementById('test-date').value;
+            const subject = document.getElementById('test-subject').value;
+            const summaryHTML = `<h2>Performance Summary</h2> <div class="summary-grid"> <div><p class="summary-value">${document.getElementById('marks-obtained').textContent}</p><p class="summary-label">Marks</p></div> <div><p class="summary-value">${document.getElementById('accuracy').textContent}</p><p class="summary-label">Accuracy</p></div> <div><p class="summary-value">${document.getElementById('attempt-rate').textContent}</p><p class="summary-label">Attempt Rate</p></div> <div><p class="summary-value">${document.getElementById('correct-count').textContent}</p><p class="summary-label">Correct</p></div> </div>`;
+            const questionsHTML = data.map(q => `<div class="question-card"> <h3>Question #${q.qNum}</h3> <table> <tr><td>Status</td><td>${q.status}</td></tr> <tr><td>Your Answer</td><td>${q.myAns || '-'}</td></tr> <tr><td>Correct Key</td><td>${q.key || '-'}</td></tr> <tr><td>Marks</td><td>${q.marks}</td></tr> <tr><td>Topic</td><td>${q.topic || '-'}</td></tr> <tr><td>Difficulty</td><td>${q.difficulty}</td></tr> <tr><td>Issue</td><td>${q.issue}</td></tr> <tr><td>Remark</td><td>${q.remark || '-'}</td></tr> </table> ${q.images.length > 0 ? `<h4>Attached Images:</h4> <div class="image-gallery"> ${q.images.map(imgUrl => `<img src="${imgUrl}" alt="Attachment for Q#${q.qNum}">`).join('')} </div>` : ''} </div>`).join('');
+            const htmlContent = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;margin:0;padding:20px}.container{max-width:900px;margin:auto;background:#161b22;padding:20px 40px;border-radius:8px;border:1px solid #30363d}h1,h2,h3,h4{color:#58a6ff;border-color:#30363d}h1{text-align:center}.test-details{text-align:center;color:#8b949e;margin-bottom:2rem}.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center;margin:2rem 0}.summary-value{font-size:2rem;font-weight:700;color:#58a6ff}.summary-label{font-size:.8rem;text-transform:uppercase;color:#8b949e}.question-card{border:1px solid #30363d;border-radius:8px;padding:20px;margin-bottom:20px}.question-card h3{margin-top:0;border-bottom:2px solid #30363d;padding-bottom:10px}.question-card table{width:100%;border-collapse:collapse}.question-card td{padding:8px;border-bottom:1px solid #30363d}.question-card td:first-child{font-weight:700;width:120px;color:#c9d1d9}.image-gallery{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}.image-gallery img{max-width:150px;max-height:150px;border-radius:4px;border:1px solid #30363d}</style></head><body><div class="container"><h1>${title}</h1><div class="test-details"><p><strong>Subject:</strong> ${subject||'N/A'}</p><p><strong>Date:</strong> ${date||'N/A'}</p></div>${summaryHTML}<h2>Question Analysis</h2>${questionsHTML}</div></body></html>`;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Analysis.html`;
+            a.click(); URL.revokeObjectURL(url);
+        };
+
+        document.getElementById('submit-suggestion-btn').onclick = () => {
+            const suggestionBox = document.getElementById('suggestion-box');
+            const suggestionText = suggestionBox.value.trim();
+            if (suggestionText === '') { alert('Please enter a suggestion before sending.'); return; }
+            const suggestionPayload = {
+                username: "Feedback Bot", avatar_url: "https://i.imgur.com/g4IARdM.png",
+                embeds: [{ title: "📬 New Suggestion Received!", description: suggestionText, color: 15277667, footer: { text: `Submitted on ${new Date().toLocaleString()}` } }]
+            };
+            sendToDiscord(suggestionPayload).then(() => { alert('Thank you for your feedback!'); suggestionBox.value = ''; });
+        };
 
         tableBody.addEventListener('input', (e) => {
             if (e.target.classList.contains('my-ans') || e.target.classList.contains('key')) {
@@ -273,276 +426,23 @@
                 const myAns = row.querySelector('.my-ans').value.trim();
                 const key = row.querySelector('.key').value.trim();
                 const statusSelect = row.querySelector('.status');
-                
-                if (myAns === '') {
-                    statusSelect.value = 'unattempted';
-                } else {
-                    statusSelect.value = myAns.toLowerCase() === key.toLowerCase() ? 'correct' : 'incorrect';
-                }
-            }
-            updateSummary();
-        });
-        
-        tableBody.addEventListener('change', (e) => {
-             if (e.target.classList.contains('image-upload-input')) {
-                handleImageUpload(e);
+                statusSelect.value = myAns === '' ? 'unattempted' : (key !== '' && myAns.toLowerCase() === key.toLowerCase()) ? 'correct' : 'incorrect';
             }
             updateSummary();
         });
 
-        function handleImageUpload(event) {
-            const input = event.target;
-            const qNum = input.dataset.qNum;
-            const previewContainer = document.getElementById(`preview-${qNum}`);
-            previewContainer.innerHTML = '';
-            imageAttachments[qNum] = [];
+        tableBody.addEventListener('change', (e) => { if (e.target.classList.contains('image-uploader-input')) { handleImageUpload(e); } updateSummary(); });
+        tableBody.addEventListener('click', (e) => { if (e.target.classList.contains('remove-image-btn')) { const { qNum, index } = e.target.dataset; removeImage(qNum, parseInt(index, 10)); } });
+        document.getElementById('reset-btn').onclick = () => { if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) { loadDefault(); } };
 
-            if (input.files.length > 3) {
-                alert('You can only upload a maximum of 3 images.');
-                input.value = ''; // Clear the selection
-                return;
-            }
-
-            for (const file of input.files) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const dataUrl = e.target.result;
-                    imageAttachments[qNum].push(dataUrl);
-
-                    const img = document.createElement('img');
-                    img.src = dataUrl;
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        document.getElementById('reset-btn').onclick = () => {
-            if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
-                loadDefault();
-            }
+        window.onload = () => {
+            loadDefault();
+            const warningOverlay = document.getElementById('telegram-warning-overlay');
+            const closeWarningBtn = document.getElementById('close-warning-btn');
+            const hideWarning = () => warningOverlay && (warningOverlay.style.display = 'none');
+            closeWarningBtn?.addEventListener('click', hideWarning);
+            warningOverlay?.addEventListener('click', (e) => e.target === warningOverlay && hideWarning());
         };
-
-        function getTableData() {
-            return Array.from(tableBody.querySelectorAll('tr')).map((row, index) => {
-                const qNum = index + 1;
-                return {
-                    qNum: qNum,
-                    myAns: row.querySelector('.my-ans').value,
-                    key: row.querySelector('.key').value,
-                    status: row.querySelector('.status').value,
-                    marks: row.querySelector('.marks').value,
-                    topic: row.querySelector('.topic').value,
-                    difficulty: row.querySelector('.difficulty').value,
-                    issue: row.querySelector('.issue').value,
-                    remark: row.querySelector('.remark').value,
-                    images: imageAttachments[qNum] || []
-                };
-            });
-        }
-
-        document.getElementById('download-csv').onclick = () => {
-            const data = getTableData();
-            let csv = 'Test Title,' + document.getElementById('test-title').value + '\n';
-            csv += 'Date,' + document.getElementById('test-date').value + '\n';
-            csv += 'Subject,' + document.getElementById('test-subject').value + '\n\n';
-            csv += 'Q#,My Ans,Key,Status,Marks,Topic,Difficulty,Issue,Remark\n';
-            
-            data.forEach(d => {
-                const row = [d.qNum, d.myAns, d.key, d.status, d.marks, d.topic, d.difficulty, d.issue, d.remark]
-                    .map(val => `"${String(val).replace(/"/g, '""')}"`)
-                    .join(',');
-                csv += row + '\n';
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'test-analysis.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-
-        document.getElementById('download-pdf').onclick = () => {
-            const doc = new jsPDF();
-            const data = getTableData();
-            const title = document.getElementById('test-title').value || 'Test Analysis';
-            const date = document.getElementById('test-date').value;
-            const subject = document.getElementById('test-subject').value;
-
-            // Title Page
-            doc.setFontSize(22);
-            doc.setFont('helvetica', 'bold');
-            doc.text(title, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
-            doc.setFontSize(14);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Subject: ${subject}`, doc.internal.pageSize.getWidth() / 2, 70, { align: 'center' });
-            doc.text(`Date: ${date}`, doc.internal.pageSize.getWidth() / 2, 80, { align: 'center' });
-            
-            // Summary
-            doc.setFontSize(12);
-            const summaryText = `Score: ${document.getElementById('marks-obtained').textContent}  |  Accuracy: ${document.getElementById('accuracy').textContent}  |  Attempt Rate: ${document.getElementById('attempt-rate').textContent}`;
-            doc.text(summaryText, doc.internal.pageSize.getWidth() / 2, 100, { align: 'center' });
-            doc.addPage();
-
-            // Per-Question Analysis
-            let yPos = 20;
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 15;
-
-            data.forEach(q => {
-                const requiredHeight = 60 + (q.images.length > 0 ? 50 : 0);
-                if (yPos + requiredHeight > pageHeight - margin) {
-                    doc.addPage();
-                    yPos = 20;
-                }
-
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text(`Question #${q.qNum}`, margin, yPos);
-                yPos += 8;
-
-                const questionData = [
-                    ['Status', q.status.toUpperCase()],
-                    ['Your Answer', q.myAns],
-                    ['Correct Key', q.key],
-                    ['Marks', q.marks],
-                    ['Topic', q.topic],
-                    ['Difficulty', q.difficulty],
-                    ['Issue', q.issue],
-                    ['Remark', q.remark]
-                ];
-                
-                doc.autoTable({
-                    body: questionData,
-                    startY: yPos,
-                    theme: 'grid',
-                    styles: { fontSize: 10 },
-                    columnStyles: { 0: { fontStyle: 'bold' } }
-                });
-                
-                yPos = doc.autoTable.previous.finalY + 10;
-
-                if (q.images.length > 0) {
-                    doc.setFontSize(10);
-                    doc.setFont('helvetica', 'bolditalic');
-                    doc.text('Attached Images:', margin, yPos);
-                    yPos += 5;
-                    let xPos = margin;
-                    q.images.forEach(imgDataUrl => {
-                        if (xPos + 45 > doc.internal.pageSize.getWidth() - margin) {
-                             xPos = margin;
-                             yPos += 45;
-                        }
-                        if (yPos + 45 > pageHeight - margin) {
-                            doc.addPage();
-                            yPos = 20;
-                            xPos = margin;
-                        }
-                        doc.addImage(imgDataUrl, 'JPEG', xPos, yPos, 40, 40);
-                        xPos += 45;
-                    });
-                     yPos += 45;
-                }
-                
-                yPos += 5; // Extra space between questions
-                doc.setDrawColor(200);
-                doc.line(margin, yPos, doc.internal.pageSize.getWidth() - margin, yPos); // Separator line
-                yPos += 10;
-            });
-            
-            doc.save(`${title.toLowerCase().replace(/\s/g, '_')}_analysis.pdf`);
-        };
-
-        document.getElementById('download-html').onclick = () => {
-            const data = getTableData();
-            const title = document.getElementById('test-title').value || 'Test Analysis';
-            const date = document.getElementById('test-date').value;
-            const subject = document.getElementById('test-subject').value;
-
-            const summaryHTML = `
-                <h2>Performance Summary</h2>
-                <div class="summary-grid">
-                    <div><p class="summary-value">${document.getElementById('marks-obtained').textContent}</p><p class="summary-label">Marks</p></div>
-                    <div><p class="summary-value">${document.getElementById('accuracy').textContent}</p><p class="summary-label">Accuracy</p></div>
-                    <div><p class="summary-value">${document.getElementById('attempt-rate').textContent}</p><p class="summary-label">Attempt Rate</p></div>
-                    <div><p class="summary-value">${document.getElementById('correct-count').textContent}</p><p class="summary-label">Correct</p></div>
-                </div>
-            `;
-
-            const questionsHTML = data.map(q => `
-                <div class="question-card">
-                    <h3>Question #${q.qNum}</h3>
-                    <table>
-                        <tr><td>Status</td><td>${q.status}</td></tr>
-                        <tr><td>Your Answer</td><td>${q.myAns || '-'}</td></tr>
-                        <tr><td>Correct Key</td><td>${q.key || '-'}</td></tr>
-                        <tr><td>Marks</td><td>${q.marks}</td></tr>
-                        <tr><td>Topic</td><td>${q.topic || '-'}</td></tr>
-                        <tr><td>Difficulty</td><td>${q.difficulty}</td></tr>
-                        <tr><td>Issue</td><td>${q.issue}</td></tr>
-                        <tr><td>Remark</td><td>${q.remark || '-'}</td></tr>
-                    </table>
-                    ${q.images.length > 0 ? `
-                        <h4>Attached Images:</h4>
-                        <div class="image-gallery">
-                            ${q.images.map(imgUrl => `<img src="${imgUrl}" alt="Attachment for Q#${q.qNum}">`).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${title}</title>
-                    <style>
-                        body { font-family: sans-serif; background: #f0f2f5; color: #333; margin: 0; padding: 20px; }
-                        .container { max-width: 900px; margin: auto; background: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                        h1, h2, h3, h4 { color: #1e3a8a; }
-                        h1 { text-align: center; }
-                        .test-details { text-align: center; color: #555; margin-bottom: 2rem; }
-                        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center; margin: 2rem 0; }
-                        .summary-value { font-size: 2rem; font-weight: bold; color: #1d4ed8; }
-                        .summary-label { font-size: 0.8rem; text-transform: uppercase; color: #666; }
-                        .question-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-                        .question-card h3 { margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
-                        .question-card table { width: 100%; border-collapse: collapse; }
-                        .question-card td { padding: 8px; border-bottom: 1px solid #eee; }
-                        .question-card td:first-child { font-weight: bold; width: 120px; color: #444; }
-                        .image-gallery { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
-                        .image-gallery img { max-width: 150px; max-height: 150px; border-radius: 4px; border: 1px solid #ccc; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>${title}</h1>
-                        <div class="test-details">
-                            <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
-                            <p><strong>Date:</strong> ${date || 'N/A'}</p>
-                        </div>
-                        ${summaryHTML}
-                        <h2>Question Analysis</h2>
-                        ${questionsHTML}
-                    </div>
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${title.toLowerCase().replace(/\s/g, '_')}_analysis.html`;
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-        
-        // Initial Load
-        window.onload = loadDefault;
     </script>
 </body>
 </html>
