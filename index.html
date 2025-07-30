@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,47 +10,125 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-color: #161b22;
-            --border-color: #30363d;
+            --bg-color: #000000;
+            --card-color: #111111;
+            --border-color: #2a2a2a;
+            --input-bg: #090909;
             --text-primary: #e6edf3;
-            --text-secondary: #7d8590;
+            --text-secondary: #8b949e;
             --highlight-color: #2f81f7;
-            --danger-color: #da3633;
-            --input-bg: #010409;
+            --danger-color: #B91C1C;
+            --danger-color-hover: #991B1B;
+            --danger-color-text: #f85149;
+            --success-color: #238636;
+            --success-color-text: #3fb950;
         }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
         }
-
+        h1 {
+            background: linear-gradient(to right, #6366F1, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #6366F1, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
         .card {
             background: var(--card-color);
             border-radius: 1rem;
             padding: 1.5rem;
             border: 1px solid var(--border-color);
+            transition: border 0.2s, box-shadow 0.2s, padding 0.2s;
         }
-
+        .card:hover {
+            padding: calc(1.5rem - 1px);
+            border: 2px dashed var(--highlight-color);
+            box-shadow: 0 0 12px rgba(47, 129, 247, 0.3);
+        }
+        .summary-panel {
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            transition: border 0.2s, box-shadow 0.2s, padding 0.2s;
+        }
+        .summary-panel:hover {
+            padding: calc(1rem - 1px);
+            border: 2px dashed var(--highlight-color);
+            box-shadow: 0 0 12px rgba(47, 129, 247, 0.3);
+        }
         .form-input, .form-select {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             background-color: var(--input-bg);
             color: var(--text-primary);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border 0.2s, box-shadow 0.2s, padding 0.2s;
             font-size: 0.95rem;
         }
-
-        .form-input::placeholder { color: var(--text-secondary); opacity: 0.8; }
+        .form-select {
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238b949e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
         .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: var(--highlight-color);
-            box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.3);
+            padding: calc(0.75rem - 1px) calc(1rem - 1px);
+            border: 2px dashed var(--highlight-color);
+            box-shadow: 0 0 8px rgba(47, 129, 247, 0.5);
         }
-
+        .form-select:focus {
+             padding-right: calc(2.5rem - 1px);
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(1) opacity(0.7);
+        }
+        .form-input.status[disabled] {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            box-shadow: none;
+            cursor: default;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+        }
+        .form-input.status[disabled]:focus {
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            padding: 0.75rem 0.5rem;
+        }
+        .form-input.status.status-correct {
+            color: var(--success-color-text);
+            font-weight: 600;
+        }
+        .form-input.status.status-incorrect {
+            color: var(--danger-color-text);
+            font-weight: 600;
+        }
+        .form-input.status.status-unattempted {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
         .summary-value {
             font-size: 2.25rem;
             font-weight: 700;
@@ -59,13 +136,13 @@
             line-height: 1.1;
         }
         .summary-label {
-            font-size: 0.8rem;
+            font-size: 0.875rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
         }
-
         .btn {
             display: inline-flex;
             align-items: center;
@@ -75,154 +152,269 @@
             border-radius: 0.5rem;
             font-weight: 600;
             text-align: center;
-            transition: all 0.2s ease-in-out;
-            border: 1px solid var(--border-color);
+            transition: all 0.2s ease-in-out, padding 0.2s;
+            border: 1px solid transparent;
             cursor: pointer;
         }
-
         .btn-primary {
             background-color: var(--highlight-color);
             color: white;
             border-color: var(--highlight-color);
         }
-        .btn-primary:hover { background-color: #1a71e8; }
-        
-        .btn-secondary {
-            background-color: #21262d;
-            color: var(--text-primary);
-            border-color: var(--border-color);
+        .btn-primary:hover {
+            background-color: #1a71e8;
         }
-        .btn-secondary:hover { border-color: var(--highlight-color); background-color: #30363d; }
-        
+        .btn-outline {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            padding: calc(0.6rem - 1px) calc(1.2rem - 1px);
+            border: 2px dashed var(--highlight-color);
+            box-shadow: 0 0 8px var(--highlight-color);
+            background-color: var(--card-color);
+            color: var(--text-primary);
+        }
         .btn-danger {
             background-color: var(--danger-color);
             color: white;
             border-color: var(--danger-color);
         }
-        .btn-danger:hover { background-color: #c93c39; }
-
+        .btn-danger:hover {
+            background-color: var(--danger-color-hover);
+            padding: calc(0.6rem - 1px) calc(1.2rem - 1px);
+            border: 2px dashed var(--danger-color);
+            box-shadow: 0 0 8px var(--danger-color);
+        }
         .image-uploader {
             position: relative;
             width: 100%;
             border: 2px dashed var(--border-color);
             border-radius: 0.75rem;
             cursor: pointer;
-            transition: border-color 0.2s, background-color 0.2s;
+            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
             min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: var(--input-bg);
         }
-        .image-uploader:hover { border-color: var(--highlight-color); background-color: var(--card-color); }
-        .image-uploader-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        
-        .uploader-prompt { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; padding: 0.5rem; }
-        .image-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; padding: 0.5rem; width: 100%; }
-        .preview-thumbnail { position: relative; aspect-ratio: 1 / 1; }
-        .preview-thumbnail img { width: 100%; height: 100%; object-fit: cover; border-radius: 0.5rem; border: 1px solid var(--border-color); }
-        .remove-image-btn {
-            position: absolute; top: -5px; right: -5px;
-            background-color: rgba(13, 17, 23, 0.8);
-            color: white; border-radius: 50%; width: 20px; height: 20px;
-            border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; line-height: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.2); backdrop-filter: blur(2px);
+        .image-uploader:hover {
+            border-color: var(--highlight-color);
+            background-color: var(--card-color);
+            box-shadow: 0 0 8px rgba(47, 129, 247, 0.5);
         }
-        
-        .modal-overlay { animation: fadeIn 0.3s ease-out forwards; }
-        .modal-box { animation: fadeInScale 0.3s ease-out forwards; }
+        .image-uploader-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .uploader-prompt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 0.5rem;
+        }
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            padding: 0.5rem;
+            width: 100%;
+        }
+        .preview-thumbnail {
+            position: relative;
+            aspect-ratio: 1 / 1;
+        }
+        .preview-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: rgba(13, 17, 23, 0.8);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            line-height: 1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(2px);
+        }
+        .hidden { display: none !important; }
+        .modal-overlay {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .modal-box {
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
+        #toast-container {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: toastIn 0.5s ease;
+        }
+        .toast.success { background-color: var(--success-color); }
+        .toast.error { background-color: var(--danger-color); }
+        .toast.info { background-color: var(--highlight-color); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
-
 <body class="p-18 sm:p-20">
     <div id="telegram-warning-overlay" class="modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div id="telegram-warning-box" class="modal-box card max-w-md w-full">
             <div class="text-center">
                 <div class="mx-auto flex-shrink-0 h-12 w-12 rounded-full bg-blue-900/50 flex items-center justify-center border border-blue-600">
-                    <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                    <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                    </svg>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-100 mt-4">Important Notice</h3>
                 <p class="text-sm text-gray-400 mt-2">For full functionality, like downloading files, please open this page in your main browser (e.g., Chrome, Safari) instead of an in-app browser.</p>
             </div>
-            <div class="mt-6"><button id="close-warning-btn" class="btn btn-primary w-full">Got it!</button></div>
+            <div class="mt-6">
+                <button id="close-warning-btn" class="btn btn-primary w-full">Got it!</button>
+            </div>
         </div>
     </div>
-    
+    <div id="confirm-modal-overlay" class="hidden modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div id="confirm-modal-box" class="modal-box card max-w-md w-full">
+            <h3 id="confirm-title" class="text-lg font-semibold text-gray-100">Are you sure?</h3>
+            <p id="confirm-text" class="text-sm text-gray-400 mt-2">This action cannot be undone.</p>
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="confirm-cancel-btn" class="btn btn-outline">Cancel</button>
+                <button id="confirm-ok-btn" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast-container"></div>
     <div class="space-y-6">
         <header class="text-center space-y-2">
             <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-100">IOQM Test Analyzer</h1>
             <p class="text-xl text-gray-400">Enter your test data for a detailed performance breakdown.</p>
         </header>
-
         <div class="card">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
                 <div class="space-y-4">
                     <h2 class="text-2xl font-bold">Test Details</h2>
                     <input id="test-title" type="text" class="form-input" placeholder="Test Title (e.g., Mock Test 1)">
                     <input id="test-date" type="date" class="form-input text-gray-400">
                     <input id="test-subject" type="text" class="form-input" placeholder="Subject (e.g., Geometry)">
                 </div>
-
                 <div class="space-y-4">
-                   <h2 class="text-2xl font-bold">Performance Summary</h2>
-                   <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-left p-4 bg-black/20 rounded-xl border border-gray-700">
-                        <div><p id="marks-obtained" class="summary-value">0/100</p><p class="summary-label">Marks</p></div>
-                        <div><p id="accuracy" class="summary-value">0%</p><p class="summary-label">Accuracy</p></div>
-                        <div><p id="attempt-rate" class="summary-value">0.0%</p><p class="summary-label">Attempt Rate</p></div>
-                        <div><p id="correct-count" class="summary-value">0</p><p class="summary-label">Correct</p></div>
-                   </div>
-                </div>
-
-                <div class="space-y-4">
-                    <h2 class="text-2xl font-bold">Actions</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                         <button id="download-pdf" class="btn btn-secondary">
-                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>PDF
-                        </button>
-                        <button id="download-html" class="btn btn-secondary">
-                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>HTML
-                        </button>
-                        <button id="reset-btn" class="btn btn-danger col-span-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Reset All
-                        </button>
+                    <h2 class="text-2xl font-bold">Performance Summary</h2>
+                    <div class="summary-panel grid grid-cols-2 gap-x-6 gap-y-4 text-left">
+                        <div>
+                            <p id="marks-obtained" class="summary-value">0/100</p>
+                            <p class="summary-label">Marks</p>
+                        </div>
+                        <div>
+                            <p id="accuracy" class="summary-value">0%</p>
+                            <p class="summary-label">Accuracy</p>
+                        </div>
+                        <div>
+                            <p id="attempt-rate" class="summary-value">0.0%</p>
+                            <p class="summary-label">Attempt Rate</p>
+                        </div>
+                        <div>
+                            <p id="correct-count" class="summary-value">0</p>
+                            <p class="summary-label">Correct</p>
+                        </div>
                     </div>
                 </div>
-                
+                <div class="space-y-4 flex flex-col gap-3">
+                    <h2 class="text-2xl font-bold">Actions</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="download-pdf" class="btn btn-outline">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>PDF
+                        </button>
+                        <button id="download-html" class="btn btn-outline">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>HTML
+                        </button>
+                    </div>
+                    <button id="reset-btn" class="btn btn-danger w-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>Reset All
+                    </button>
+                </div>
                 <div class="space-y-4">
                     <h2 class="text-2xl font-bold">Feedback & Suggestions</h2>
                     <p class="text-gray-400 text-sm">Have an idea to improve this tool? Let me know!</p>
-                    <div class="flex flex-col sm:flex-row items-start gap-3">
-                        <textarea id="suggestion-box" class="form-input flex-grow" rows="2" placeholder="Type your suggestion here..."></textarea>
+                    <div class="flex flex-col sm:flex-row items-stretch gap-3">
+                        <textarea id="suggestion-box" class="form-input flex-grow" rows="3" placeholder="Type your suggestion here..."></textarea>
                         <button id="submit-suggestion-btn" class="btn btn-primary w-full sm:w-auto">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Send
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>Send
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="card overflow-x-auto">
             <h2 class="text-2xl font-bold mb-4">Per-Question Analysis</h2>
             <table id="question-table" class="w-full min-w-[1400px] text-sm text-left">
                 <thead class="bg-black/20 text-xs text-gray-400 uppercase rounded-lg">
                     <tr>
-                        <th class="p-4 font-semibold">Q#</th><th class="p-4 font-semibold w-24">My Ans</th><th class="p-4 font-semibold w-24">Key</th><th class="p-4 font-semibold">Status</th><th class="p-4 font-semibold w-20">Marks</th><th class="p-4 font-semibold">Topic</th><th class="p-4 font-semibold">Difficulty</th><th class="p-4 font-semibold">Issue</th><th class="p-4 font-semibold">Remark</th><th class="p-4 font-semibold w-56">Image Attachments</th>
+                        <th class="p-4 font-semibold">Q#</th>
+                        <th class="p-4 font-semibold w-24">My Ans</th>
+                        <th class="p-4 font-semibold w-24">Key</th>
+                        <th class="p-4 font-semibold">Status</th>
+                        <th class="p-4 font-semibold w-20">Marks</th>
+                        <th class="p-4 font-semibold">Topic</th>
+                        <th class="p-4 font-semibold">Difficulty</th>
+                        <th class="p-4 font-semibold">Issue</th>
+                        <th class="p-4 font-semibold">Remark</th>
+                        <th class="p-4 font-semibold w-56">Image Attachments</th>
                     </tr>
                 </thead>
                 <tbody id="analysis-table-body" class="divide-y divide-gray-700"></tbody>
             </table>
         </div>
-
         <footer class="space-y-6">
             <div class="text-center text-gray-500 text-sm pb-4">
-                <p>&copy;IOQM Test Analyzer. By exokomitis.</p>
-                <p>Built with ❤️ for math enthusiasts.</p>
+                <p><span class="gradient-text">&copy;IOQM Test Analyzer. By exokomitis.</span></p>
+                <p><span class="gradient-text">Built with ❤️ for math enthusiasts.</span></p>
             </div>
         </footer>
     </div>
-
     <script>
         const discordWebhookUrl = 'https://discord.com/api/webhooks/1399780677976588490/bjUGP61mx3tpjn8PQCqYq5UC1RWq1q5nIU-Y6Cgsu6I27m-YV_Qk-D2FAkZPUNUpLZZF';
         const { jsPDF } = window.jspdf;
@@ -231,12 +423,49 @@
         const NUM_QUESTIONS = 30;
         let imageAttachments = {};
 
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
+        function showConfirm(title, text, onConfirm) {
+            const overlay = document.getElementById('confirm-modal-overlay');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-text').textContent = text;
+            overlay.classList.remove('hidden');
+            
+            const okBtn = document.getElementById('confirm-ok-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            
+            const close = () => overlay.classList.add('hidden');
+
+            okBtn.onclick = () => {
+                onConfirm();
+                close();
+            };
+            cancelBtn.onclick = close;
+        }
+
         async function sendToDiscord(payload) {
             if (!discordWebhookUrl || discordWebhookUrl.includes('YOUR_WEBHOOK_URL')) {
-                console.warn("Discord Webhook URL not set."); return;
+                console.warn("Discord Webhook URL not set.");
+                return;
             }
-            try { await fetch(discordWebhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); } 
-            catch (error) { console.error('Failed to send Discord notification:', error); }
+            try {
+                await fetch(discordWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (error) {
+                console.error('Failed to send Discord notification:', error);
+            }
         }
 
         function createRow(i) {
@@ -247,8 +476,9 @@
             const defaultDifficulty = i <= 10 ? 'Easy' : (i <= 20 ? 'Moderate' : 'Hard');
             row.innerHTML = `
                 <td class="p-3 text-center text-gray-400 font-medium">${i}</td>
-                <td class="p-2"><input class="form-input my-ans" placeholder="Ans"></td><td class="p-2"><input class="form-input key" placeholder="Key"></td>
-                <td class="p-2"><select class="form-select status" disabled><option value="unattempted">Unattempted</option><option value="correct">Correct</option><option value="incorrect">Incorrect</option></select></td>
+                <td class="p-2"><input class="form-input my-ans" placeholder="Ans"></td>
+                <td class="p-2"><input class="form-input key" placeholder="Key"></td>
+                <td class="p-2"><input type="text" class="form-input status status-unattempted" value="Unattempted" disabled></td>
                 <td class="p-2"><input type="number" class="form-input marks" value="${marks}"></td>
                 <td class="p-2"><select class="form-select topic">${topics.map(t => `<option>${t}</option>`).join('')}</select></td>
                 <td class="p-2"><select class="form-select difficulty"><option>Easy</option><option>Moderate</option><option>Hard</option></select></td>
@@ -275,7 +505,9 @@
             document.getElementById('test-subject').value = '';
             tableBody.innerHTML = '';
             imageAttachments = {};
-            for (let i = 1; i <= NUM_QUESTIONS; i++) { tableBody.appendChild(createRow(i)); }
+            for (let i = 1; i <= NUM_QUESTIONS; i++) {
+                tableBody.appendChild(createRow(i));
+            }
             updateSummary();
         }
 
@@ -286,8 +518,11 @@
                 const status = row.querySelector('.status').value;
                 const marks = parseInt(row.querySelector('.marks').value, 10) || 0;
                 totalMarks += marks;
-                if (status !== 'unattempted') attemptedCount++;
-                if (status === 'correct') { correctCount++; obtainedMarks += marks; }
+                if (status !== 'Unattempted') attemptedCount++;
+                if (status === 'Correct') {
+                    correctCount++;
+                    obtainedMarks += marks;
+                }
             });
             const accuracy = attemptedCount > 0 ? (correctCount / attemptedCount * 100).toFixed(1) : '0';
             const attemptRate = rows.length > 0 ? (attemptedCount / rows.length * 100).toFixed(1) : '0';
@@ -303,11 +538,15 @@
             const files = Array.from(input.files);
             if (files.length === 0) return;
             if ((imageAttachments[qNum]?.length || 0) + files.length > 5) {
-                alert('You can only upload a maximum of 5 images per question.'); return;
+                showToast('You can only upload a maximum of 5 images.', 'error');
+                return;
             }
             files.forEach(file => {
                 const reader = new FileReader();
-                reader.onload = (e) => { imageAttachments[qNum].push({ name: file.name, url: e.target.result }); renderImagePreviews(qNum); };
+                reader.onload = (e) => {
+                    imageAttachments[qNum].push({ name: file.name, url: e.target.result });
+                    renderImagePreviews(qNum);
+                };
                 reader.readAsDataURL(file);
             });
             input.value = '';
@@ -333,13 +572,26 @@
                     thumb.innerHTML = `<img src="${file.url}" alt="${file.name}"><button class="remove-image-btn" data-q-num="${qNum}" data-index="${index}">&times;</button>`;
                     previewContainer.appendChild(thumb);
                 });
-            } else { prompt.style.display = 'flex'; }
+            } else {
+                prompt.style.display = 'flex';
+            }
         }
         
         function getTableData() {
             return Array.from(tableBody.querySelectorAll('tr')).map((row, index) => {
                 const qNum = index + 1;
-                return { qNum, myAns: row.querySelector('.my-ans').value, key: row.querySelector('.key').value, status: row.querySelector('.status').value, marks: row.querySelector('.marks').value, topic: row.querySelector('.topic').value, difficulty: row.querySelector('.difficulty').value, issue: row.querySelector('.issue').value, remark: row.querySelector('.remark').value, images: (imageAttachments[qNum] || []).map(f => f.url) };
+                return {
+                    qNum,
+                    myAns: row.querySelector('.my-ans').value,
+                    key: row.querySelector('.key').value,
+                    status: row.querySelector('.status').value,
+                    marks: row.querySelector('.marks').value,
+                    topic: row.querySelector('.topic').value,
+                    difficulty: row.querySelector('.difficulty').value,
+                    issue: row.querySelector('.issue').value,
+                    remark: row.querySelector('.remark').value,
+                    images: (imageAttachments[qNum] || []).map(f => f.url)
+                };
             });
         }
         
@@ -350,12 +602,17 @@
             const accuracy = document.getElementById('accuracy').textContent;
             const attemptRate = document.getElementById('attempt-rate').textContent;
             const usagePayload = {
-                username: "Test Analyzer Bot", avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
-                embeds: [{ title: `📊 New Test Analysis Exported: ${exportType.toUpperCase()}`, color: 3447003, fields: [ { name: "Test Title", value: testTitle, inline: true }, { name: "Subject", value: subject, inline: true }, { name: "Score", value: score, inline: true }, { name: "Accuracy", value: accuracy, inline: true }, { name: "Attempt Rate", value: attemptRate, inline: true } ], footer: { text: `Exported on ${new Date().toLocaleString()}` } }]
+                username: "Test Analyzer Bot",
+                avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
+                embeds: [{
+                    title: `📊 New Test Analysis Exported: ${exportType.toUpperCase()}`,
+                    color: 3447003,
+                    fields: [ { name: "Test Title", value: testTitle, inline: true }, { name: "Subject", value: subject, inline: true }, { name: "Score", value: score, inline: true }, { name: "Accuracy", value: accuracy, inline: true }, { name: "Attempt Rate", value: attemptRate, inline: true } ],
+                    footer: { text: `Exported on ${new Date().toLocaleString()}` }
+                }]
             };
             sendToDiscord(usagePayload);
         }
-
         document.getElementById('download-pdf').onclick = () => {
             handleExport('pdf');
             const doc = new jsPDF();
@@ -393,7 +650,6 @@
             });
             doc.save(`Analysis.pdf`);
         };
-
         document.getElementById('download-html').onclick = () => {
             handleExport('html');
             const data = getTableData();
@@ -408,33 +664,67 @@
             const a = document.createElement('a'); a.href = url; a.download = `Analysis.html`;
             a.click(); URL.revokeObjectURL(url);
         };
-
         document.getElementById('submit-suggestion-btn').onclick = () => {
             const suggestionBox = document.getElementById('suggestion-box');
             const suggestionText = suggestionBox.value.trim();
-            if (suggestionText === '') { alert('Please enter a suggestion before sending.'); return; }
+            if (suggestionText === '') {
+                showToast('Please enter a suggestion before sending.', 'error');
+                return;
+            }
             const suggestionPayload = {
-                username: "Feedback Bot", avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
-                embeds: [{ title: "📬 New Suggestion Received!", description: suggestionText, color: 15277667, footer: { text: `Submitted on ${new Date().toLocaleString()}` } }]
+                username: "Feedback Bot",
+                avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
+                embeds: [{
+                    title: "📬 New Suggestion Received!",
+                    description: suggestionText,
+                    color: 15277667,
+                    footer: { text: `Submitted on ${new Date().toLocaleString()}` }
+                }]
             };
-            sendToDiscord(suggestionPayload).then(() => { alert('Thank you for your feedback!'); suggestionBox.value = ''; });
+            sendToDiscord(suggestionPayload).then(() => {
+                showToast('Thank you for your feedback!', 'success');
+                suggestionBox.value = '';
+            });
         };
-
         tableBody.addEventListener('input', (e) => {
             if (e.target.classList.contains('my-ans') || e.target.classList.contains('key')) {
                 const row = e.target.closest('tr');
                 const myAns = row.querySelector('.my-ans').value.trim();
                 const key = row.querySelector('.key').value.trim();
-                const statusSelect = row.querySelector('.status');
-                statusSelect.value = myAns === '' ? 'unattempted' : (key !== '' && myAns.toLowerCase() === key.toLowerCase()) ? 'correct' : 'incorrect';
+                const statusInput = row.querySelector('.status');
+
+                statusInput.classList.remove('status-correct', 'status-incorrect', 'status-unattempted');
+
+                if (myAns === '') {
+                    statusInput.value = 'Unattempted';
+                    statusInput.classList.add('status-unattempted');
+                } else {
+                    if (key !== '' && myAns.toLowerCase() === key.toLowerCase()) {
+                        statusInput.value = 'Correct';
+                        statusInput.classList.add('status-correct');
+                    } else {
+                        statusInput.value = 'Incorrect';
+                        statusInput.classList.add('status-incorrect');
+                    }
+                }
             }
             updateSummary();
         });
-
-        tableBody.addEventListener('change', (e) => { if (e.target.classList.contains('image-uploader-input')) { handleImageUpload(e); } updateSummary(); });
-        tableBody.addEventListener('click', (e) => { if (e.target.classList.contains('remove-image-btn')) { const { qNum, index } = e.target.dataset; removeImage(qNum, parseInt(index, 10)); } });
-        document.getElementById('reset-btn').onclick = () => { if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) { loadDefault(); } };
-
+        tableBody.addEventListener('change', (e) => {
+            if (e.target.classList.contains('image-uploader-input')) {
+                handleImageUpload(e);
+            }
+            updateSummary();
+        });
+        tableBody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-image-btn')) {
+                const { qNum, index } = e.target.dataset;
+                removeImage(qNum, parseInt(index, 10));
+            }
+        });
+        document.getElementById('reset-btn').onclick = () => {
+            showConfirm('Reset All Data?', 'This action cannot be undone and will clear all entries.', loadDefault);
+        };
         window.onload = () => {
             loadDefault();
             const warningOverlay = document.getElementById('telegram-warning-overlay');
