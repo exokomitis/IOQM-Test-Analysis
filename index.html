@@ -350,7 +350,7 @@
             const accuracy = document.getElementById('accuracy').textContent;
             const attemptRate = document.getElementById('attempt-rate').textContent;
             const usagePayload = {
-                username: "Test Analyzer Bot", avatar_url: "https://i.imgur.com/g4IARdM.png",
+                username: "Test Analyzer Bot", avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
                 embeds: [{ title: `📊 New Test Analysis Exported: ${exportType.toUpperCase()}`, color: 3447003, fields: [ { name: "Test Title", value: testTitle, inline: true }, { name: "Subject", value: subject, inline: true }, { name: "Score", value: score, inline: true }, { name: "Accuracy", value: accuracy, inline: true }, { name: "Attempt Rate", value: attemptRate, inline: true } ], footer: { text: `Exported on ${new Date().toLocaleString()}` } }]
             };
             sendToDiscord(usagePayload);
@@ -414,7 +414,7 @@
             const suggestionText = suggestionBox.value.trim();
             if (suggestionText === '') { alert('Please enter a suggestion before sending.'); return; }
             const suggestionPayload = {
-                username: "Feedback Bot", avatar_url: "https://i.imgur.com/g4IARdM.png",
+                username: "Feedback Bot", avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
                 embeds: [{ title: "📬 New Suggestion Received!", description: suggestionText, color: 15277667, footer: { text: `Submitted on ${new Date().toLocaleString()}` } }]
             };
             sendToDiscord(suggestionPayload).then(() => { alert('Thank you for your feedback!'); suggestionBox.value = ''; });
