@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOQM Test Analyzer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #000000;
@@ -28,12 +29,21 @@
             background-color: var(--bg-color);
             color: var(--text-primary);
         }
-        h1 {
-            background: linear-gradient(to right, #6366F1, #8B5CF6, #EC4899);
+        h1.animated-title {
+            font-weight: 900;
+            background: linear-gradient(90deg, #EC4899, #8B5CF6, #6366F1, #8B5CF6, #EC4899);
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             color: transparent;
+            animation: animate-gradient 5s linear infinite;
+            text-shadow: 0 0 15px rgba(236, 72, 153, 0.2), 0 0 25px rgba(139, 92, 246, 0.2);
+        }
+        @keyframes animate-gradient {
+            to {
+                background-position: 200% center;
+            }
         }
         .gradient-text {
             background: linear-gradient(to right, #6366F1, #8B5CF6, #EC4899);
@@ -67,7 +77,7 @@
             border: 2px dashed var(--highlight-color);
             box-shadow: 0 0 12px rgba(47, 129, 247, 0.3);
         }
-        .form-input, .form-select {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid var(--border-color);
@@ -76,6 +86,9 @@
             color: var(--text-primary);
             transition: border 0.2s, box-shadow 0.2s, padding 0.2s;
             font-size: 0.95rem;
+        }
+        .form-textarea {
+            resize: vertical;
         }
         .form-select {
             -webkit-appearance: none;
@@ -86,11 +99,11 @@
             background-size: 1.5em 1.5em;
             padding-right: 2.5rem;
         }
-        .form-input::placeholder {
+        .form-input::placeholder, .form-textarea::placeholder {
             color: var(--text-secondary);
             opacity: 0.8;
         }
-        .form-input:focus, .form-select:focus {
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             padding: calc(0.75rem - 1px) calc(1rem - 1px);
             border: 2px dashed var(--highlight-color);
@@ -163,6 +176,14 @@
         }
         .btn-primary:hover {
             background-color: #1a71e8;
+        }
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+        .btn-success:hover {
+            background-color: #1e6f2d;
         }
         .btn-outline {
             background-color: var(--input-bg);
@@ -240,6 +261,7 @@
             object-fit: cover;
             border-radius: 0.5rem;
             border: 1px solid var(--border-color);
+            cursor: pointer;
         }
         .remove-image-btn {
             position: absolute;
@@ -271,7 +293,7 @@
             position: fixed;
             bottom: 1.25rem;
             right: 1.25rem;
-            z-index: 9999;
+            z-index: 10000;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
@@ -290,27 +312,102 @@
         @keyframes toastIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        /* Tagging System Styles */
+        .tag-area {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 45px; /* Match form input height */
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            background-color: var(--input-bg);
+            transition: border 0.2s, box-shadow 0.2s;
+            cursor: text;
+        }
+        .tag-area:focus-within {
+            padding: calc(0.5rem - 1px);
+            border: 2px dashed var(--highlight-color);
+            box-shadow: 0 0 8px rgba(47, 129, 247, 0.5);
+        }
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--highlight-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .tag-remove-btn {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            width: 1rem;
+            height: 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            border: none;
+        }
+        .tag-entry {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            padding: 0.25rem;
+            min-width: 120px;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close-btn:hover {
+            color: var(--text-primary);
+        }
     </style>
 </head>
-<body class="p-18 sm:p-20">
-    <div id="telegram-warning-overlay" class="modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div id="telegram-warning-box" class="modal-box card max-w-md w-full">
+<body class="p-4 sm:p-8 md:p-12">
+    <!-- Modals -->
+    <div id="functionality-warning-overlay" class="hidden modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
+        <div class="modal-box card max-w-md w-full">
             <div class="text-center">
                 <div class="mx-auto flex-shrink-0 h-12 w-12 rounded-full bg-blue-900/50 flex items-center justify-center border border-blue-600">
-                    <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                    </svg>
+                    <svg class="h-6 w-6 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-100 mt-4">Important Notice</h3>
                 <p class="text-sm text-gray-400 mt-2">For full functionality, like downloading files, please open this page in your main browser (e.g., Chrome, Safari) instead of an in-app browser.</p>
             </div>
-            <div class="mt-6">
-                <button id="close-warning-btn" class="btn btn-primary w-full">Got it!</button>
-            </div>
+            <div class="mt-6"><button id="close-functionality-warning-btn" class="btn btn-primary w-full">Got it!</button></div>
         </div>
     </div>
-    <div id="confirm-modal-overlay" class="hidden modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div id="confirm-modal-box" class="modal-box card max-w-md w-full">
+    
+    <div id="ai-prompt-info-overlay" class="hidden modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
+        <div class="modal-box card max-w-md w-full">
+            <div class="text-center">
+                <div class="mx-auto flex-shrink-0 h-12 w-12 rounded-full bg-green-900/50 flex items-center justify-center border border-green-600">
+                     <svg class="h-6 w-6 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-100 mt-4">Prompt Copied to Clipboard!</h3>
+                <p class="text-sm text-gray-400 mt-2">You can now go to any AI model like Gemini, Claude, or ChatGPT and paste the content to get your personalized performance analysis.</p>
+            </div>
+            <div class="mt-6"><button id="close-ai-prompt-info-btn" class="btn btn-primary w-full">Awesome!</button></div>
+        </div>
+    </div>
+
+    <div id="confirm-modal-overlay" class="hidden modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
+        <div class="modal-box card max-w-md w-full">
             <h3 id="confirm-title" class="text-lg font-semibold text-gray-100">Are you sure?</h3>
             <p id="confirm-text" class="text-sm text-gray-400 mt-2">This action cannot be undone.</p>
             <div class="mt-6 flex justify-end gap-3">
@@ -319,78 +416,84 @@
             </div>
         </div>
     </div>
+    
+    <div id="history-modal-overlay" class="hidden modal-overlay fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="modal-box card max-w-3xl w-full flex flex-col" style="max-height: 80vh;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-100">Test History</h3>
+                <button id="close-history-btn" class="modal-close-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="history-list" class="flex-grow overflow-y-auto space-y-3 pr-2"></div>
+        </div>
+    </div>
+
+    <div id="image-preview-modal-overlay" class="hidden modal-overlay fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[70] backdrop-blur-sm">
+        <img id="image-preview-full" src="" alt="Full size preview" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl">
+        <button id="close-image-preview-btn" class="modal-close-btn absolute top-4 right-4">
+             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+
     <div id="toast-container"></div>
     <div class="space-y-6">
-        <header class="text-center space-y-2">
-            <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-100">IOQM Test Analyzer</h1>
-            <p class="text-xl text-gray-400">Enter your test data for a detailed performance breakdown.</p>
-        </header>
+        <div class="card text-center">
+            <h1 class="animated-title text-5xl sm:text-6xl md:text-7xl">IOQM Test Analyzer</h1>
+            <p class="text-xl text-gray-400 mt-2">Your personal IOQM test performance tracker.</p>
+        </div>
         <div class="card">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-                <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Test Details Column -->
+                <div class="space-y-4 flex flex-col">
                     <h2 class="text-2xl font-bold">Test Details</h2>
-                    <input id="test-title" type="text" class="form-input" placeholder="Test Title (e.g., Mock Test 1)">
-                    <input id="test-date" type="date" class="form-input text-gray-400">
-                    <input id="test-subject" type="text" class="form-input" placeholder="Subject (e.g., Geometry)">
-                </div>
-                <div class="space-y-4">
-                    <h2 class="text-2xl font-bold">Performance Summary</h2>
-                    <div class="summary-panel grid grid-cols-2 gap-x-6 gap-y-4 text-left">
-                        <div>
-                            <p id="marks-obtained" class="summary-value">0/100</p>
-                            <p class="summary-label">Marks</p>
-                        </div>
-                        <div>
-                            <p id="accuracy" class="summary-value">0%</p>
-                            <p class="summary-label">Accuracy</p>
-                        </div>
-                        <div>
-                            <p id="attempt-rate" class="summary-value">0.0%</p>
-                            <p class="summary-label">Attempt Rate</p>
-                        </div>
-                        <div>
-                            <p id="correct-count" class="summary-value">0</p>
-                            <p class="summary-label">Correct</p>
-                        </div>
+                    <div class="flex-grow space-y-3 flex flex-col">
+                        <input id="test-title" type="text" class="form-input" placeholder="Test Title (e.g., Mock Test 1)">
+                        <input id="test-date" type="date" class="form-input text-gray-400">
+                        <input id="test-subject" type="text" class="form-input" placeholder="Subject (e.g., Geometry)">
                     </div>
                 </div>
-                <div class="space-y-4 flex flex-col gap-3">
+        
+                <!-- Performance Column -->
+                <div class="space-y-4 flex flex-col">
+                    <h2 class="text-2xl font-bold">Performance</h2>
+                    <div class="summary-panel grid grid-cols-2 gap-x-6 gap-y-4 text-left flex-grow">
+                        <div><p id="marks-obtained" class="summary-value">0/100</p><p class="summary-label">Marks</p></div>
+                        <div><p id="accuracy" class="summary-value">0%</p><p class="summary-label">Accuracy</p></div>
+                        <div><p id="attempt-rate" class="summary-value">0.0%</p><p class="summary-label">Attempt Rate</p></div>
+                        <div><p id="correct-count" class="summary-value">0</p><p class="summary-label">Correct</p></div>
+                    </div>
+                </div>
+        
+                <!-- Actions Column -->
+                <div class="space-y-4 flex flex-col">
                     <h2 class="text-2xl font-bold">Actions</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button id="download-pdf" class="btn btn-outline">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>PDF
-                        </button>
-                        <button id="download-html" class="btn btn-outline">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                            </svg>HTML
-                        </button>
+                    <div class="space-y-3 flex-grow flex flex-col">
+                        <button id="save-btn" class="btn btn-success w-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>Save & Finalize</button>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="history-btn" class="btn btn-outline"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"></path></svg>History</button>
+                            <button id="ai-analysis-btn" class="btn btn-outline"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.553L16.5 21.75l-.398-1.197a3.375 3.375 0 00-2.456-2.456L12.75 18l1.197-.398a3.375 3.375 0 002.456-2.456L16.5 14.25l.398 1.197a3.375 3.375 0 002.456 2.456L20.25 18l-1.197.398a3.375 3.375 0 00-2.456 2.456z" /></svg>AI</button>
+                            <button id="download-pdf" class="btn btn-outline"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>PDF</button>
+                            <button id="download-html" class="btn btn-outline"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>HTML</button>
+                        </div>
+                        <button id="reset-btn" class="btn btn-danger w-full mt-auto"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Reset Current</button>
                     </div>
-                    <button id="reset-btn" class="btn btn-danger w-full">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>Reset All
-                    </button>
                 </div>
-                <div class="space-y-4">
-                    <h2 class="text-2xl font-bold">Feedback & Suggestions</h2>
+        
+                <!-- Feedback Column -->
+                <div class="space-y-4 flex flex-col h-full">
+                    <h2 class="text-2xl font-bold">Feedback</h2>
                     <p class="text-gray-400 text-sm">Have an idea to improve this tool? Let me know!</p>
-                    <div class="flex flex-col sm:flex-row items-stretch gap-3">
-                        <textarea id="suggestion-box" class="form-input flex-grow" rows="3" placeholder="Type your suggestion here..."></textarea>
-                        <button id="submit-suggestion-btn" class="btn btn-primary w-full sm:w-auto">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>Send
-                        </button>
+                    <div class="flex flex-col flex-grow gap-3">
+                        <textarea id="suggestion-box" class="form-textarea flex-grow" rows="3" placeholder="Type your suggestion here..."></textarea>
+                        <button id="submit-suggestion-btn" class="btn btn-primary w-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Send</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card overflow-x-auto">
             <h2 class="text-2xl font-bold mb-4">Per-Question Analysis</h2>
-            <table id="question-table" class="w-full min-w-[1400px] text-sm text-left">
+            <table id="question-table" class="w-full min-w-[1600px] text-sm text-left">
                 <thead class="bg-black/20 text-xs text-gray-400 uppercase rounded-lg">
                     <tr>
                         <th class="p-4 font-semibold">Q#</th>
@@ -402,6 +505,7 @@
                         <th class="p-4 font-semibold">Difficulty</th>
                         <th class="p-4 font-semibold">Issue</th>
                         <th class="p-4 font-semibold">Remark</th>
+                        <th class="p-4 font-semibold">Concepts</th>
                         <th class="p-4 font-semibold w-56">Image Attachments</th>
                     </tr>
                 </thead>
@@ -416,40 +520,72 @@
         </footer>
     </div>
     <script>
+        // --- GLOBAL CONFIG & CONSTANTS ---
         const discordWebhookUrl = 'https://discord.com/api/webhooks/1399780677976588490/bjUGP61mx3tpjn8PQCqYq5UC1RWq1q5nIU-Y6Cgsu6I27m-YV_Qk-D2FAkZPUNUpLZZF';
         const { jsPDF } = window.jspdf;
         const topics = ['', 'Algebra', 'Combinatorics', 'Geometry', 'Number Theory'];
-        const tableBody = document.getElementById('analysis-table-body');
+        const issues = ['N/A', 'Calculation Error', 'Conceptual Gap', 'Silly Mistake', 'Time Pressure', 'Misread Question'];
+        const difficulties = ['Easy', 'Moderate', 'Hard'];
         const NUM_QUESTIONS = 30;
         let imageAttachments = {};
 
+        // --- DOM ELEMENT GETTERS ---
+        const DOMElements = {
+            tableBody: document.getElementById('analysis-table-body'),
+            testTitle: document.getElementById('test-title'),
+            testDate: document.getElementById('test-date'),
+            testSubject: document.getElementById('test-subject'),
+            marksObtained: document.getElementById('marks-obtained'),
+            accuracy: document.getElementById('accuracy'),
+            attemptRate: document.getElementById('attempt-rate'),
+            correctCount: document.getElementById('correct-count'),
+            suggestionBox: document.getElementById('suggestion-box'),
+            // Modals & Overlays
+            confirmModal: {
+                overlay: document.getElementById('confirm-modal-overlay'),
+                title: document.getElementById('confirm-title'),
+                text: document.getElementById('confirm-text'),
+                okBtn: document.getElementById('confirm-ok-btn'),
+                cancelBtn: document.getElementById('confirm-cancel-btn')
+            },
+            historyModal: {
+                overlay: document.getElementById('history-modal-overlay'),
+                list: document.getElementById('history-list'),
+                closeBtn: document.getElementById('close-history-btn')
+            },
+            functionalityWarning: {
+                overlay: document.getElementById('functionality-warning-overlay'),
+                closeBtn: document.getElementById('close-functionality-warning-btn')
+            },
+            aiPromptInfo: {
+                overlay: document.getElementById('ai-prompt-info-overlay'),
+                closeBtn: document.getElementById('close-ai-prompt-info-btn')
+            },
+            imagePreviewModal: {
+                overlay: document.getElementById('image-preview-modal-overlay'),
+                image: document.getElementById('image-preview-full'),
+                closeBtn: document.getElementById('close-image-preview-btn')
+            }
+        };
+
+        // --- UTILITY & HELPER FUNCTIONS ---
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.remove();
-            }, 4000);
+            setTimeout(() => toast.remove(), 4000);
         }
 
-        function showConfirm(title, text, onConfirm) {
-            const overlay = document.getElementById('confirm-modal-overlay');
-            document.getElementById('confirm-title').textContent = title;
-            document.getElementById('confirm-text').textContent = text;
+        function showConfirm(title, text, onConfirm, onCancel = () => {}) {
+            const { overlay, title: titleEl, text: textEl, okBtn, cancelBtn } = DOMElements.confirmModal;
+            titleEl.textContent = title;
+            textEl.textContent = text;
             overlay.classList.remove('hidden');
-            
-            const okBtn = document.getElementById('confirm-ok-btn');
-            const cancelBtn = document.getElementById('confirm-cancel-btn');
-            
             const close = () => overlay.classList.add('hidden');
-
-            okBtn.onclick = () => {
-                onConfirm();
-                close();
-            };
-            cancelBtn.onclick = close;
+            okBtn.onclick = () => { onConfirm(); close(); };
+            cancelBtn.onclick = () => { onCancel(); close(); };
         }
 
         async function sendToDiscord(payload) {
@@ -468,6 +604,101 @@
             }
         }
 
+        // --- LOCAL STORAGE & DATA MANAGEMENT ---
+        const LocalStorageManager = {
+            saveSession(data) {
+                try {
+                    localStorage.setItem('ioqmAnalyzerSession', JSON.stringify(data));
+                } catch (e) {
+                    console.error("Error saving session:", e);
+                    showToast("Could not save session. Browser storage might be full.", "error");
+                }
+            },
+            loadSession() {
+                const data = localStorage.getItem('ioqmAnalyzerSession');
+                return data ? JSON.parse(data) : null;
+            },
+            clearSession() {
+                localStorage.removeItem('ioqmAnalyzerSession');
+            },
+            getHistory() {
+                const history = localStorage.getItem('ioqmTestHistory');
+                return history ? JSON.parse(history) : [];
+            },
+            saveTestToHistory(testData) {
+                const history = this.getHistory();
+                const existingIndex = history.findIndex(t => t.id === testData.id);
+                if (existingIndex > -1) {
+                    history[existingIndex] = testData;
+                } else {
+                    history.unshift(testData);
+                }
+                localStorage.setItem('ioqmTestHistory', JSON.stringify(history));
+            },
+            deleteTestFromHistory(testId) {
+                let history = this.getHistory();
+                history = history.filter(t => t.id !== testId);
+                localStorage.setItem('ioqmTestHistory', JSON.stringify(history));
+                renderHistory();
+            }
+        };
+
+        // --- CORE APPLICATION LOGIC ---
+        function getCurrentState() {
+            return {
+                details: {
+                    title: DOMElements.testTitle.value,
+                    date: DOMElements.testDate.value,
+                    subject: DOMElements.testSubject.value,
+                },
+                questions: getTableData(),
+                attachments: imageAttachments
+            };
+        }
+
+        function loadState(state) {
+            if (!state) return;
+            const { details, questions, attachments } = state;
+            DOMElements.testTitle.value = details.title || '';
+            DOMElements.testDate.value = details.date || new Date().toISOString().slice(0, 10);
+            DOMElements.testSubject.value = details.subject || '';
+            
+            DOMElements.tableBody.innerHTML = '';
+            imageAttachments = attachments || {};
+            questions.forEach(qData => {
+                const row = createRow(qData.qNum);
+                row.querySelector('.my-ans').value = qData.myAns;
+                row.querySelector('.key').value = qData.key;
+                row.querySelector('.marks').value = qData.marks;
+                row.querySelector('.topic').value = qData.topic;
+                row.querySelector('.difficulty').value = qData.difficulty;
+                row.querySelector('.issue').value = qData.issue;
+                row.querySelector('.remark').value = qData.remark;
+                
+                const tagArea = row.querySelector('.tag-area');
+                if (qData.concepts && qData.concepts.length > 0) {
+                    qData.concepts.forEach(concept => createTagPill(tagArea, concept));
+                }
+
+                DOMElements.tableBody.appendChild(row);
+                updateRowStatus(row);
+                if (imageAttachments[qData.qNum] && imageAttachments[qData.qNum].length > 0) {
+                    renderImagePreviews(qData.qNum);
+                }
+            });
+            updateSummary();
+        }
+
+        function createTagPill(tagArea, text) {
+            const tagPill = document.createElement('div');
+            tagPill.className = 'tag-pill';
+            tagPill.innerHTML = `
+                <span>${text}</span>
+                <button type="button" class="tag-remove-btn">&times;</button>
+            `;
+            tagArea.insertBefore(tagPill, tagArea.querySelector('.tag-entry'));
+        }
+
         function createRow(i) {
             const row = document.createElement('tr');
             row.className = 'hover:bg-gray-900/50 transition-colors';
@@ -481,9 +712,14 @@
                 <td class="p-2"><input type="text" class="form-input status status-unattempted" value="Unattempted" disabled></td>
                 <td class="p-2"><input type="number" class="form-input marks" value="${marks}"></td>
                 <td class="p-2"><select class="form-select topic">${topics.map(t => `<option>${t}</option>`).join('')}</select></td>
-                <td class="p-2"><select class="form-select difficulty"><option>Easy</option><option>Moderate</option><option>Hard</option></select></td>
-                <td class="p-2"><select class="form-select issue"><option>N/A</option><option>Calculation Error</option><option>Conceptual Gap</option><option>Silly Mistake</option><option>Time Pressure</option><option>Misread Question</option></select></td>
-                <td class="p-2"><input class="form-input remark" placeholder="Notes..."></td>
+                <td class="p-2"><select class="form-select difficulty">${difficulties.map(d => `<option>${d}</option>`).join('')}</select></td>
+                <td class="p-2"><select class="form-select issue">${issues.map(is => `<option>${is}</option>`).join('')}</select></td>
+                <td class="p-2"><textarea class="form-textarea remark" placeholder="Notes..." rows="1"></textarea></td>
+                <td class="p-2">
+                    <div class="tag-area" onclick="this.querySelector('.tag-entry').focus()">
+                        <input class="tag-entry" type="text" placeholder="Add concepts...">
+                    </div>
+                </td>
                 <td class="p-2">
                     <div class="image-uploader" id="uploader-${i}" data-q-num="${i}">
                         <div class="uploader-prompt" id="prompt-${i}">
@@ -495,24 +731,44 @@
                     </div>
                 </td>`;
             row.querySelector('.difficulty').value = defaultDifficulty;
-            imageAttachments[i] = [];
+            if (!imageAttachments[i]) imageAttachments[i] = [];
             return row;
         }
 
-        function loadDefault() {
-            document.getElementById('test-title').value = '';
-            document.getElementById('test-date').value = new Date().toISOString().slice(0, 10);
-            document.getElementById('test-subject').value = '';
-            tableBody.innerHTML = '';
+        function resetForm() {
+            DOMElements.tableBody.innerHTML = '';
             imageAttachments = {};
             for (let i = 1; i <= NUM_QUESTIONS; i++) {
-                tableBody.appendChild(createRow(i));
+                DOMElements.tableBody.appendChild(createRow(i));
             }
+            DOMElements.testTitle.value = '';
+            DOMElements.testDate.value = new Date().toISOString().slice(0, 10);
+            DOMElements.testSubject.value = '';
             updateSummary();
+            LocalStorageManager.clearSession();
+        }
+
+        function updateRowStatus(row) {
+            const myAns = row.querySelector('.my-ans').value.trim();
+            const key = row.querySelector('.key').value.trim();
+            const statusInput = row.querySelector('.status');
+            statusInput.classList.remove('status-correct', 'status-incorrect', 'status-unattempted');
+            if (myAns === '') {
+                statusInput.value = 'Unattempted';
+                statusInput.classList.add('status-unattempted');
+            } else {
+                if (key !== '' && myAns.toLowerCase() === key.toLowerCase()) {
+                    statusInput.value = 'Correct';
+                    statusInput.classList.add('status-correct');
+                } else {
+                    statusInput.value = 'Incorrect';
+                    statusInput.classList.add('status-incorrect');
+                }
+            }
         }
 
         function updateSummary() {
-            const rows = tableBody.querySelectorAll('tr');
+            const rows = DOMElements.tableBody.querySelectorAll('tr');
             let totalMarks = 0, obtainedMarks = 0, correctCount = 0, attemptedCount = 0;
             rows.forEach(row => {
                 const status = row.querySelector('.status').value;
@@ -526,12 +782,33 @@
             });
             const accuracy = attemptedCount > 0 ? (correctCount / attemptedCount * 100).toFixed(1) : '0';
             const attemptRate = rows.length > 0 ? (attemptedCount / rows.length * 100).toFixed(1) : '0';
-            document.getElementById('marks-obtained').textContent = `${obtainedMarks}/${totalMarks}`;
-            document.getElementById('accuracy').textContent = `${accuracy}%`;
-            document.getElementById('attempt-rate').textContent = `${attemptRate}%`;
-            document.getElementById('correct-count').textContent = correctCount;
+            DOMElements.marksObtained.textContent = `${obtainedMarks}/${totalMarks}`;
+            DOMElements.accuracy.textContent = `${accuracy}%`;
+            DOMElements.attemptRate.textContent = `${attemptRate}%`;
+            DOMElements.correctCount.textContent = correctCount;
+            LocalStorageManager.saveSession(getCurrentState());
         }
 
+        function getTableData() {
+            return Array.from(DOMElements.tableBody.querySelectorAll('tr')).map((row, index) => {
+                const qNum = index + 1;
+                return {
+                    qNum,
+                    myAns: row.querySelector('.my-ans').value,
+                    key: row.querySelector('.key').value,
+                    status: row.querySelector('.status').value,
+                    marks: row.querySelector('.marks').value,
+                    topic: row.querySelector('.topic').value,
+                    difficulty: row.querySelector('.difficulty').value,
+                    issue: row.querySelector('.issue').value,
+                    remark: row.querySelector('.remark').value,
+                    concepts: Array.from(row.querySelectorAll('.tag-pill span')).map(span => span.textContent),
+                    images: (imageAttachments[qNum] || []).map(f => f.url)
+                };
+            });
+        }
+        
+        // --- IMAGE HANDLING ---
         function handleImageUpload(event) {
             const input = event.target;
             const qNum = input.dataset.qNum;
@@ -546,6 +823,7 @@
                 reader.onload = (e) => {
                     imageAttachments[qNum].push({ name: file.name, url: e.target.result });
                     renderImagePreviews(qNum);
+                    LocalStorageManager.saveSession(getCurrentState());
                 };
                 reader.readAsDataURL(file);
             });
@@ -556,6 +834,7 @@
             if (imageAttachments[qNum] && imageAttachments[qNum][index]) {
                 imageAttachments[qNum].splice(index, 1);
                 renderImagePreviews(qNum);
+                LocalStorageManager.saveSession(getCurrentState());
             }
         }
 
@@ -564,43 +843,50 @@
             const prompt = document.getElementById(`prompt-${qNum}`);
             previewContainer.innerHTML = '';
             const attachments = imageAttachments[qNum] || [];
-            if (attachments.length > 0) {
-                prompt.style.display = 'none';
-                attachments.forEach((file, index) => {
-                    const thumb = document.createElement('div');
-                    thumb.className = 'preview-thumbnail';
-                    thumb.innerHTML = `<img src="${file.url}" alt="${file.name}"><button class="remove-image-btn" data-q-num="${qNum}" data-index="${index}">&times;</button>`;
-                    previewContainer.appendChild(thumb);
-                });
-            } else {
-                prompt.style.display = 'flex';
-            }
-        }
-        
-        function getTableData() {
-            return Array.from(tableBody.querySelectorAll('tr')).map((row, index) => {
-                const qNum = index + 1;
-                return {
-                    qNum,
-                    myAns: row.querySelector('.my-ans').value,
-                    key: row.querySelector('.key').value,
-                    status: row.querySelector('.status').value,
-                    marks: row.querySelector('.marks').value,
-                    topic: row.querySelector('.topic').value,
-                    difficulty: row.querySelector('.difficulty').value,
-                    issue: row.querySelector('.issue').value,
-                    remark: row.querySelector('.remark').value,
-                    images: (imageAttachments[qNum] || []).map(f => f.url)
-                };
+            prompt.style.display = attachments.length > 0 ? 'none' : 'flex';
+            attachments.forEach((file, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'preview-thumbnail';
+                thumb.innerHTML = `<img src="${file.url}" alt="${file.name}"><button class="remove-image-btn" data-q-num="${qNum}" data-index="${index}">&times;</button>`;
+                previewContainer.appendChild(thumb);
             });
         }
-        
+
+        // --- HISTORY ---
+        function renderHistory() {
+            const history = LocalStorageManager.getHistory();
+            const { list } = DOMElements.historyModal;
+            list.innerHTML = '';
+            if (history.length === 0) {
+                list.innerHTML = `<p class="text-gray-400 text-center">No saved tests found.</p>`;
+                return;
+            }
+            history.forEach(test => {
+                const testCard = document.createElement('div');
+                testCard.className = 'p-4 rounded-lg bg-gray-900/50 border border-gray-700 flex justify-between items-center';
+                const score = test.questions.reduce((acc, q) => acc + (q.status === 'Correct' ? parseInt(q.marks, 10) : 0), 0);
+                const total = test.questions.reduce((acc, q) => acc + parseInt(q.marks, 10), 0);
+                testCard.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-white">${test.details.title || 'Untitled Test'}</h4>
+                        <p class="text-sm text-gray-400">${new Date(test.details.date).toLocaleDateString()} - Score: ${score}/${total}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline btn-sm load-history-btn" data-id="${test.id}">Load</button>
+                        <button class="btn btn-danger btn-sm delete-history-btn" data-id="${test.id}">Delete</button>
+                    </div>
+                `;
+                list.appendChild(testCard);
+            });
+        }
+
+        // --- EXPORTING & AI PROMPT ---
         function handleExport(exportType) {
-            const testTitle = document.getElementById('test-title').value || 'Untitled Test';
-            const subject = document.getElementById('test-subject').value || 'N/A';
-            const score = document.getElementById('marks-obtained').textContent;
-            const accuracy = document.getElementById('accuracy').textContent;
-            const attemptRate = document.getElementById('attempt-rate').textContent;
+            const testTitle = DOMElements.testTitle.value || 'Untitled Test';
+            const subject = DOMElements.testSubject.value || 'N/A';
+            const score = DOMElements.marksObtained.textContent;
+            const accuracy = DOMElements.accuracy.textContent;
+            const attemptRate = DOMElements.attemptRate.textContent;
             const usagePayload = {
                 username: "Test Analyzer Bot",
                 avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
@@ -613,125 +899,327 @@
             };
             sendToDiscord(usagePayload);
         }
-        document.getElementById('download-pdf').onclick = () => {
+        
+        function generateAiPromptText() {
+            const testDetails = `
+### Test Details
+- **Title:** ${DOMElements.testTitle.value || 'N/A'}
+- **Date:** ${DOMElements.testDate.value || 'N/A'}
+- **Subject:** ${DOMElements.testSubject.value || 'N/A'}
+`;
+
+            const performanceSummary = `
+### Overall Performance
+- **Score:** ${DOMElements.marksObtained.textContent}
+- **Accuracy:** ${DOMElements.accuracy.textContent}
+- **Attempt Rate:** ${DOMElements.attemptRate.textContent}
+- **Correct Questions:** ${DOMElements.correctCount.textContent}
+`;
+
+            const questionData = getTableData()
+                .filter(q => q.status !== 'Unattempted' || q.key)
+                .map(q => `
+---
+**Question #${q.qNum}**
+- **Status:** ${q.status}
+- **Your Answer:** ${q.myAns || 'N/A'}
+- **Correct Key:** ${q.key || 'N/A'}
+- **Marks:** ${q.marks}
+- **Topic:** ${q.topic || 'N/A'}
+- **Difficulty:** ${q.difficulty}
+- **Issue:** ${q.issue}
+- **Concepts:** ${q.concepts.join(', ') || 'N/A'}
+- **Remark:** ${q.remark || 'N/A'}
+`).join('');
+
+            const prompt = `
+**Act as an expert mathematics olympiad coach.** Your task is to provide a deep, insightful, and strategic analysis of the following IOQM test performance data.
+
+**Your analysis should include:**
+1.  **Overall Performance Summary:** Briefly comment on the total score, accuracy, and attempt rate.
+2.  **Topic-wise Breakdown (Strengths & Weaknesses):** Analyze the performance in Algebra, Geometry, Number Theory, and Combinatorics. Identify which topics are strengths and which require immediate attention. Use the provided data to back up your claims.
+3.  **Mistake Pattern Analysis:** Look at the "Issue" column for incorrect answers. Identify the most common types of errors (e.g., Calculation Error, Conceptual Gap, Silly Mistake). Provide advice on how to mitigate these specific types of errors.
+4.  **Concept-Level Insights:** Analyze the "Concepts" tags. Are there specific concepts (e.g., "Cyclic Quadrilaterals", "Modular Arithmetic") where the student is consistently making mistakes? Highlight these for targeted practice.
+5.  **Strategic Recommendations & Study Plan:** Based on everything, provide a concise, actionable study plan for the next 2-3 weeks. Suggest specific areas to focus on, types of problems to practice, and potential strategies for future tests (e.g., time management, review process).
+
+Your tone should be encouraging but direct. The goal is to provide a clear path for improvement.
+
+---
+**PERFORMANCE DATA:**
+${testDetails}
+${performanceSummary}
+### Per-Question Data
+${questionData}
+`;
+            return prompt.trim();
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('AI prompt copied to clipboard!', 'success');
+                    DOMElements.aiPromptInfo.overlay.classList.remove('hidden');
+                } else {
+                    showToast('Failed to copy prompt.', 'error');
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                showToast('Failed to copy prompt.', 'error');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function downloadPdf() {
             handleExport('pdf');
             const doc = new jsPDF();
             const data = getTableData();
-            const title = document.getElementById('test-title').value || 'Test Analysis';
-            const date = document.getElementById('test-date').value;
-            const subject = document.getElementById('test-subject').value;
-            doc.setFontSize(22); doc.setFont('helvetica', 'bold');
-            doc.text(title, doc.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
-            doc.setFontSize(14); doc.setFont('helvetica', 'normal');
-            doc.text(`Subject: ${subject}`, doc.internal.pageSize.getWidth() / 2, 70, { align: 'center' });
-            doc.text(`Date: ${date}`, doc.internal.pageSize.getWidth() / 2, 80, { align: 'center' });
-            doc.setFontSize(12);
-            const summaryText = `Score: ${document.getElementById('marks-obtained').textContent} | Accuracy: ${document.getElementById('accuracy').textContent} | Attempt Rate: ${document.getElementById('attempt-rate').textContent}`;
-            doc.text(summaryText, doc.internal.pageSize.getWidth() / 2, 100, { align: 'center' });
-            doc.addPage();
-            let yPos = 20; const pageHeight = doc.internal.pageSize.getHeight(); const margin = 15;
+            const title = DOMElements.testTitle.value || 'Test Analysis';
+            const date = DOMElements.testDate.value;
+            const subject = DOMElements.testSubject.value;
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 15;
+            const analyzerUrl = 'https://github.com/exokomitis/IOQM-Test-Analyzer';
+
+            const addHeaderFooter = (pageNumber) => {
+                doc.setFillColor(0, 0, 0); doc.rect(0, 0, pageWidth, pageHeight, 'F');
+                if (pageNumber === 1) {
+                    doc.setFontSize(24); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+                    doc.text(title, pageWidth / 2, 40, { align: 'center' });
+                    doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.setTextColor(139, 148, 158);
+                    doc.text(`Subject: ${subject || 'N/A'} | Date: ${date || 'N/A'}`, pageWidth / 2, 50, { align: 'center' });
+                    const summaryText = `Score: ${DOMElements.marksObtained.textContent} | Accuracy: ${DOMElements.accuracy.textContent} | Attempt Rate: ${DOMElements.attemptRate.textContent}`;
+                    doc.text(summaryText, pageWidth / 2, 60, { align: 'center' });
+                }
+                doc.setFontSize(8); doc.setTextColor(139, 148, 158);
+                doc.text(`Page ${pageNumber}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+                doc.textWithLink('IOQM Test Analyzer by exokomitis', margin, pageHeight - 10, { url: analyzerUrl });
+            };
+
+            let yPos = 80; let pageNumber = 1; addHeaderFooter(pageNumber);
             data.forEach(q => {
-                const requiredHeight = 60 + (q.images.length > 0 ? 50 : 0);
-                if (yPos + requiredHeight > pageHeight - margin) { doc.addPage(); yPos = 20; }
-                doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.text(`Question #${q.qNum}`, margin, yPos); yPos += 8;
-                const questionData = [['Status', q.status.toUpperCase()], ['Your Answer', q.myAns], ['Correct Key', q.key], ['Marks', q.marks], ['Topic', q.topic], ['Difficulty', q.difficulty], ['Issue', q.issue], ['Remark', q.remark]];
-                doc.autoTable({ body: questionData, startY: yPos, theme: 'grid', styles: { fontSize: 10 }, columnStyles: { 0: { fontStyle: 'bold' } } });
+                const conceptsText = q.concepts.join(', ') || '-';
+                const questionData = [
+                    ['Status', q.status], ['Your Answer', q.myAns || '-'], ['Correct Key', q.key || '-'],
+                    ['Marks', q.marks], ['Topic', q.topic || '-'], ['Difficulty', q.difficulty],
+                    ['Issue', q.issue], ['Remark', q.remark || '-'], ['Concepts', conceptsText]
+                ];
+                const remarkHeight = doc.getTextDimensions(q.remark, { fontSize: 9, maxWidth: pageWidth - (margin * 4) }).h;
+                const conceptsHeight = doc.getTextDimensions(conceptsText, { fontSize: 9, maxWidth: pageWidth - (margin * 4) }).h;
+                const requiredHeight = 60 + remarkHeight + conceptsHeight + (q.images.length > 0 ? 45 : 0);
+                if (yPos + requiredHeight > pageHeight - 20) {
+                    pageNumber++; doc.addPage(); addHeaderFooter(pageNumber); yPos = 20;
+                }
+                doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(47, 129, 247);
+                doc.text(`Question #${q.qNum}`, margin, yPos); yPos += 6;
+                doc.autoTable({
+                    body: questionData, startY: yPos, theme: 'grid',
+                    styles: { fillColor: [10, 10, 10], textColor: [255, 255, 255], lineColor: [50, 50, 50], lineWidth: 0.1, fontSize: 9 },
+                    headStyles: { fillColor: false, textColor: false, fontSize: 0 },
+                    columnStyles: { 0: { fontStyle: 'bold', textColor: [139, 148, 158], cellWidth: 30 } },
+                    didParseCell: function(data) {
+                        if (data.row.index === 0 && data.section === 'body') {
+                            if (data.cell.raw === 'Correct') data.cell.styles.textColor = '#3fb950';
+                            if (data.cell.raw === 'Incorrect') data.cell.styles.textColor = '#f85149';
+                        }
+                    }
+                });
                 yPos = doc.autoTable.previous.finalY + 10;
                 if (q.images.length > 0) {
-                    doc.setFontSize(10); doc.setFont('helvetica', 'bolditalic'); doc.text('Attached Images:', margin, yPos); yPos += 5; let xPos = margin;
+                    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(139, 148, 158);
+                    doc.text('Attached Images:', margin, yPos); yPos += 5; let xPos = margin;
                     q.images.forEach(imgDataUrl => {
-                        if (xPos + 45 > doc.internal.pageSize.getWidth() - margin) { xPos = margin; yPos += 45; }
-                        if (yPos + 45 > pageHeight - margin) { doc.addPage(); yPos = 20; xPos = margin; }
+                        if (xPos + 42 > pageWidth - margin) { xPos = margin; yPos += 42; }
+                        if (yPos + 42 > pageHeight - 20) { pageNumber++; doc.addPage(); addHeaderFooter(pageNumber); yPos = 20; xPos = margin; }
+                        doc.setDrawColor(42, 42, 42); doc.rect(xPos - 1, yPos - 1, 42, 42);
                         doc.addImage(imgDataUrl, 'JPEG', xPos, yPos, 40, 40); xPos += 45;
                     });
                     yPos += 45;
                 }
-                yPos += 5; doc.setDrawColor(200); doc.line(margin, yPos, doc.internal.pageSize.getWidth() - margin, yPos); yPos += 10;
+                yPos += 2;
             });
-            doc.save(`Analysis.pdf`);
-        };
-        document.getElementById('download-html').onclick = () => {
+            doc.save(`${title.replace(/ /g, '_')}_Analysis.pdf`);
+        }
+
+        function downloadHtml() {
             handleExport('html');
             const data = getTableData();
-            const title = document.getElementById('test-title').value || 'Test Analysis';
-            const date = document.getElementById('test-date').value;
-            const subject = document.getElementById('test-subject').value;
-            const summaryHTML = `<h2>Performance Summary</h2> <div class="summary-grid"> <div><p class="summary-value">${document.getElementById('marks-obtained').textContent}</p><p class="summary-label">Marks</p></div> <div><p class="summary-value">${document.getElementById('accuracy').textContent}</p><p class="summary-label">Accuracy</p></div> <div><p class="summary-value">${document.getElementById('attempt-rate').textContent}</p><p class="summary-label">Attempt Rate</p></div> <div><p class="summary-value">${document.getElementById('correct-count').textContent}</p><p class="summary-label">Correct</p></div> </div>`;
-            const questionsHTML = data.map(q => `<div class="question-card"> <h3>Question #${q.qNum}</h3> <table> <tr><td>Status</td><td>${q.status}</td></tr> <tr><td>Your Answer</td><td>${q.myAns || '-'}</td></tr> <tr><td>Correct Key</td><td>${q.key || '-'}</td></tr> <tr><td>Marks</td><td>${q.marks}</td></tr> <tr><td>Topic</td><td>${q.topic || '-'}</td></tr> <tr><td>Difficulty</td><td>${q.difficulty}</td></tr> <tr><td>Issue</td><td>${q.issue}</td></tr> <tr><td>Remark</td><td>${q.remark || '-'}</td></tr> </table> ${q.images.length > 0 ? `<h4>Attached Images:</h4> <div class="image-gallery"> ${q.images.map(imgUrl => `<img src="${imgUrl}" alt="Attachment for Q#${q.qNum}">`).join('')} </div>` : ''} </div>`).join('');
-            const htmlContent = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;margin:0;padding:20px}.container{max-width:900px;margin:auto;background:#161b22;padding:20px 40px;border-radius:8px;border:1px solid #30363d}h1,h2,h3,h4{color:#58a6ff;border-color:#30363d}h1{text-align:center}.test-details{text-align:center;color:#8b949e;margin-bottom:2rem}.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center;margin:2rem 0}.summary-value{font-size:2rem;font-weight:700;color:#58a6ff}.summary-label{font-size:.8rem;text-transform:uppercase;color:#8b949e}.question-card{border:1px solid #30363d;border-radius:8px;padding:20px;margin-bottom:20px}.question-card h3{margin-top:0;border-bottom:2px solid #30363d;padding-bottom:10px}.question-card table{width:100%;border-collapse:collapse}.question-card td{padding:8px;border-bottom:1px solid #30363d}.question-card td:first-child{font-weight:700;width:120px;color:#c9d1d9}.image-gallery{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}.image-gallery img{max-width:150px;max-height:150px;border-radius:4px;border:1px solid #30363d}</style></head><body><div class="container"><h1>${title}</h1><div class="test-details"><p><strong>Subject:</strong> ${subject||'N/A'}</p><p><strong>Date:</strong> ${date||'N/A'}</p></div>${summaryHTML}<h2>Question Analysis</h2>${questionsHTML}</div></body></html>`;
+            const title = DOMElements.testTitle.value || 'Test Analysis';
+            const date = DOMElements.testDate.value;
+            const subject = DOMElements.testSubject.value;
+            const analyzerUrl = 'https://github.com/exokomitis/IOQM-Test-Analyzer';
+            const summaryHTML = `<div class="summary-card"><h2>Performance Summary</h2> <div class="summary-grid"> <div><p class="summary-value">${DOMElements.marksObtained.textContent}</p><p class="summary-label">Marks</p></div> <div><p class="summary-value">${DOMElements.accuracy.textContent}</p><p class="summary-label">Accuracy</p></div> <div><p class="summary-value">${DOMElements.attemptRate.textContent}</p><p class="summary-label">Attempt Rate</p></div> <div><p class="summary-value">${DOMElements.correctCount.textContent}</p><p class="summary-label">Correct</p></div> </div></div>`;
+            const questionsHTML = data.map(q => `<div class="question-card"> <h3>Question #${q.qNum}</h3> <div class="details-grid"> <div class="detail-item"><span class="label">Status</span><span class="value status-${q.status.toLowerCase()}">${q.status}</span></div> <div class="detail-item"><span class="label">Your Answer</span><span class="value">${q.myAns || '-'}</span></div> <div class="detail-item"><span class="label">Correct Key</span><span class="value">${q.key || '-'}</span></div> <div class="detail-item"><span class="label">Marks</span><span class="value">${q.marks}</span></div> <div class="detail-item"><span class="label">Topic</span><span class="value">${q.topic || '-'}</span></div> <div class="detail-item"><span class="label">Difficulty</span><span class="value">${q.difficulty}</span></div> <div class="detail-item"><span class="label">Issue</span><span class="value">${q.issue}</span></div> ${q.remark ? `<div class="detail-item remark-item"><span class="label">Remark</span><p class="value">${q.remark}</p></div>` : ''} ${q.concepts.length > 0 ? `<div class="detail-item remark-item"><span class="label">Concepts</span><p class="value">${q.concepts.join(', ')}</p></div>` : ''} </div> ${q.images.length > 0 ? `<h4>Attached Images:</h4> <div class="image-gallery"> ${q.images.map(imgUrl => `<a href="${imgUrl}" target="_blank"><img src="${imgUrl}" alt="Attachment for Q#${q.qNum}"></a>`).join('')} </div>` : ''} </div>`).join('');
+            const htmlContent = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>body{font-family:'Inter',sans-serif;background-color:#000;color:#e6edf3;margin:0;padding:2rem}.container{max-width:900px;margin:auto}h1,h2,h3,h4{font-weight:700}h1{font-size:2.5rem;text-align:center;background:linear-gradient(to right, #6366F1, #8B5CF6, #EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.5rem}h2{font-size:1.5rem;color:#2f81f7;border-bottom:1px solid #2a2a2a;padding-bottom:0.5rem;margin-top:2.5rem}h3{font-size:1.25rem;color:#e6edf3;margin-bottom:1rem}h4{margin-top:1.5rem;margin-bottom:0.5rem;color:#8b949e;font-size:0.9rem;text-transform:uppercase}.test-details{text-align:center;color:#8b949e;margin-bottom:2rem}.summary-card, .question-card{background-color:#111;border:1px solid #2a2a2a;border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,0.3)}.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1.5rem;text-align:center;margin-top:1rem}.summary-value{font-size:2rem;font-weight:700;color:#e6edf3}.summary-label{font-size:.8rem;text-transform:uppercase;color:#8b949e;margin-top:0.25rem}.details-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem}.detail-item{display:flex;flex-direction:column;background-color:#090909;padding:0.75rem;border-radius:0.5rem;border:1px solid #2a2a2a}.detail-item .label{font-size:0.8rem;color:#8b949e;margin-bottom:0.25rem}.detail-item .value{font-weight:500;word-break:break-word}.remark-item{grid-column:1 / -1}.remark-item p{white-space:pre-wrap;margin:0}.status-correct{color:#3fb950;font-weight:600}.status-incorrect{color:#f85149;font-weight:600}.status-unattempted{color:#8b949e}.image-gallery{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}.image-gallery img{max-width:150px;max-height:150px;border-radius:8px;border:1px solid #2a2a2a;transition:transform .2s, box-shadow .2s}.image-gallery img:hover{transform:scale(1.05);box-shadow:0 0 15px rgba(47,129,247,0.5)}</style></head><body><div class="container"><h1>${title}</h1><div class="test-details"><p><strong>Subject:</strong> ${subject||'N/A'} | <strong>Date:</strong> ${date||'N/A'}</p></div>${summaryHTML}<h2>Per-Question Analysis</h2>${questionsHTML}<footer style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #2a2a2a; color: #8b949e; font-size: 0.9rem;"><p>&copy; <a href="${analyzerUrl}" target="_blank" style="color: #a5b4fc; text-decoration: none;">IOQM Test Analyzer</a>. By exokomitis.</p></footer></div></body></html>`;
             const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Analysis.html`;
+            const a = document.createElement('a'); a.href = url; a.download = `${title.replace(/ /g, '_')}_Analysis.html`;
             a.click(); URL.revokeObjectURL(url);
-        };
-        document.getElementById('submit-suggestion-btn').onclick = () => {
-            const suggestionBox = document.getElementById('suggestion-box');
-            const suggestionText = suggestionBox.value.trim();
-            if (suggestionText === '') {
-                showToast('Please enter a suggestion before sending.', 'error');
-                return;
-            }
-            const suggestionPayload = {
-                username: "Feedback Bot",
-                avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
-                embeds: [{
-                    title: "📬 New Suggestion Received!",
-                    description: suggestionText,
-                    color: 15277667,
-                    footer: { text: `Submitted on ${new Date().toLocaleString()}` }
-                }]
-            };
-            sendToDiscord(suggestionPayload).then(() => {
-                showToast('Thank you for your feedback!', 'success');
-                suggestionBox.value = '';
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            DOMElements.tableBody.addEventListener('input', (e) => {
+                const target = e.target;
+                if (target.classList.contains('remark')) {
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                }
+                if (target.classList.contains('my-ans') || target.classList.contains('key')) {
+                    updateRowStatus(target.closest('tr'));
+                }
+                updateSummary();
             });
-        };
-        tableBody.addEventListener('input', (e) => {
-            if (e.target.classList.contains('my-ans') || e.target.classList.contains('key')) {
-                const row = e.target.closest('tr');
-                const myAns = row.querySelector('.my-ans').value.trim();
-                const key = row.querySelector('.key').value.trim();
-                const statusInput = row.querySelector('.status');
 
-                statusInput.classList.remove('status-correct', 'status-incorrect', 'status-unattempted');
+            DOMElements.tableBody.addEventListener('change', (e) => {
+                if (e.target.classList.contains('image-uploader-input')) handleImageUpload(e);
+                updateSummary();
+            });
 
-                if (myAns === '') {
-                    statusInput.value = 'Unattempted';
-                    statusInput.classList.add('status-unattempted');
-                } else {
-                    if (key !== '' && myAns.toLowerCase() === key.toLowerCase()) {
-                        statusInput.value = 'Correct';
-                        statusInput.classList.add('status-correct');
-                    } else {
-                        statusInput.value = 'Incorrect';
-                        statusInput.classList.add('status-incorrect');
+            DOMElements.tableBody.addEventListener('click', (e) => {
+                if (e.target.closest('.remove-image-btn')) {
+                    const btn = e.target.closest('.remove-image-btn');
+                    const { qNum, index } = btn.dataset;
+                    removeImage(qNum, parseInt(index, 10));
+                }
+                if (e.target.closest('.tag-remove-btn')) {
+                    e.target.closest('.tag-pill').remove();
+                    updateSummary(); // Save session
+                }
+                if (e.target.tagName === 'IMG' && e.target.closest('.preview-thumbnail')) {
+                    DOMElements.imagePreviewModal.image.src = e.target.src;
+                    DOMElements.imagePreviewModal.overlay.classList.remove('hidden');
+                }
+            });
+
+            DOMElements.tableBody.addEventListener('keydown', (e) => {
+                if (e.target.classList.contains('tag-entry')) {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        const input = e.target;
+                        const value = input.value.trim();
+                        if (value) {
+                            const tagArea = input.closest('.tag-area');
+                            createTagPill(tagArea, value);
+                            input.value = '';
+                            updateSummary(); // Save session
+                        }
+                    } else if (e.key === 'Backspace' && e.target.value === '') {
+                        const tagArea = e.target.closest('.tag-area');
+                        const lastTag = Array.from(tagArea.querySelectorAll('.tag-pill')).pop();
+                        if (lastTag) {
+                            lastTag.remove();
+                            updateSummary(); // Save session
+                        }
                     }
                 }
-            }
-            updateSummary();
-        });
-        tableBody.addEventListener('change', (e) => {
-            if (e.target.classList.contains('image-uploader-input')) {
-                handleImageUpload(e);
-            }
-            updateSummary();
-        });
-        tableBody.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-image-btn')) {
-                const { qNum, index } = e.target.dataset;
-                removeImage(qNum, parseInt(index, 10));
-            }
-        });
-        document.getElementById('reset-btn').onclick = () => {
-            showConfirm('Reset All Data?', 'This action cannot be undone and will clear all entries.', loadDefault);
-        };
+            });
+
+            document.getElementById('reset-btn').onclick = () => {
+                showConfirm('Reset Current Form?', 'This will clear all entries on the page. This action cannot be undone.', resetForm);
+            };
+
+            document.getElementById('save-btn').onclick = () => {
+                const title = DOMElements.testTitle.value.trim();
+                if (!title) {
+                    showToast("Please enter a test title before saving.", "error");
+                    return;
+                }
+                const history = LocalStorageManager.getHistory();
+                if (history.some(test => test.details.title === title)) {
+                    showToast("A test with this title already exists. Please use a unique name.", "error");
+                    return;
+                }
+                const testData = { ...getCurrentState(), id: Date.now() };
+                LocalStorageManager.saveTestToHistory(testData);
+                showToast("Test saved successfully!", "success");
+            };
+
+            document.getElementById('history-btn').onclick = () => {
+                renderHistory();
+                DOMElements.historyModal.overlay.classList.remove('hidden');
+            };
+            
+            document.getElementById('ai-analysis-btn').onclick = () => {
+                const promptText = generateAiPromptText();
+                copyToClipboard(promptText);
+            };
+
+            DOMElements.historyModal.list.addEventListener('click', (e) => {
+                const target = e.target.closest('button');
+                if (!target) return;
+                const id = parseInt(target.dataset.id, 10);
+                if (target.classList.contains('load-history-btn')) {
+                    const test = LocalStorageManager.getHistory().find(t => t.id === id);
+                    if (test) {
+                        loadState(test);
+                        DOMElements.historyModal.overlay.classList.add('hidden');
+                        showToast("Test loaded successfully!", "info");
+                    }
+                } else if (target.classList.contains('delete-history-btn')) {
+                    showConfirm("Delete this test?", "This saved analysis will be permanently deleted.", () => {
+                        LocalStorageManager.deleteTestFromHistory(id);
+                    });
+                }
+            });
+            
+            document.getElementById('download-pdf').onclick = downloadPdf;
+            document.getElementById('download-html').onclick = downloadHtml;
+
+            document.getElementById('submit-suggestion-btn').onclick = () => {
+                const suggestionText = DOMElements.suggestionBox.value.trim();
+                if (suggestionText === '') {
+                    showToast('Please enter a suggestion before sending.', 'error');
+                    return;
+                }
+                const suggestionPayload = {
+                    username: "Feedback Bot",
+                    avatar_url: "https://i.pinimg.com/736x/47/f6/18/47f618b8b5b6075deb0c414ee09fe65c.jpg",
+                    embeds: [{ title: "📬 New Suggestion Received!", description: suggestionText, color: 15277667, footer: { text: `Submitted on ${new Date().toLocaleString()}` } }]
+                };
+                sendToDiscord(suggestionPayload).then(() => {
+                    showToast('Thank you for your feedback!', 'success');
+                    DOMElements.suggestionBox.value = '';
+                });
+            };
+
+            // Modal close buttons
+            [DOMElements.historyModal, DOMElements.functionalityWarning, DOMElements.imagePreviewModal, DOMElements.aiPromptInfo].forEach(modal => {
+                modal.closeBtn.onclick = () => modal.overlay.classList.add('hidden');
+                modal.overlay.onclick = (e) => { if(e.target === modal.overlay) modal.overlay.classList.add('hidden'); };
+            });
+        }
+        
+        // --- INITIALIZATION ---
         window.onload = () => {
-            loadDefault();
-            const warningOverlay = document.getElementById('telegram-warning-overlay');
-            const closeWarningBtn = document.getElementById('close-warning-btn');
-            const hideWarning = () => warningOverlay && (warningOverlay.style.display = 'none');
-            closeWarningBtn?.addEventListener('click', hideWarning);
-            warningOverlay?.addEventListener('click', (e) => e.target === warningOverlay && hideWarning());
+            const savedSession = LocalStorageManager.loadSession();
+            if (savedSession && Object.keys(savedSession.questions).length > 0) {
+                showConfirm("Resume previous session?", "We found unsaved data from your last session. Do you want to restore it?",
+                    () => { loadState(savedSession); showToast("Session restored.", "info"); },
+                    () => { resetForm(); }
+                );
+            } else {
+                resetForm();
+            }
+
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isTelegram = /telegram/i.test(ua);
+            const isLikelyInApp = /FBAN|FBAV|Instagram|WebView|APP/i.test(ua);
+
+            if (isLikelyInApp || isTelegram) {
+                DOMElements.functionalityWarning.overlay.classList.remove('hidden');
+            }
+            
+            setupEventListeners();
         };
     </script>
 </body>
